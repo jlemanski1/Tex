@@ -59,3 +59,9 @@ void editorProcessKeyPress();
 
 */
 void editorRefreshScreen();
+
+/*
+    Handles drawing each row of the buffer of text being edited.
+    Current fraw a tilde ~ in each row, that row is not part of the file and can't contain text
+*/
+void editorDrawRows();

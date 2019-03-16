@@ -68,6 +68,15 @@ char editorReadKey() {
                                    OUTPUT
 --------------------------------------------------------------------------*/
 
+void editorDrawRows() {
+    int y;  // Terminal height
+    // Draw 24 rows of ~
+    for(y = 0; y < 24; y++)
+    {
+        write(STDOUT_FILENO, "~\r\n", 3);
+    }
+}
+
 void editorRefreshScreen() {
     /*
         \x1b - escape character, decimal: 27
@@ -77,6 +86,10 @@ void editorRefreshScreen() {
     */
     write(STDOUT_FILENO, "\x1b[2J", 4); // Write 4 bytes
     write(STDOUT_FILENO, "\x1b[H", 3);  // Reposition cursor to top left
+
+    editorDrawRows();
+
+    write(STDOUT_FILENO, "\x1b[H", 3);
 }
 
 
