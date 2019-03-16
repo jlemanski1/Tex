@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <sys/ioctl.h>
+#include <string.h>
 
 /*
     *NOTE*:
@@ -64,10 +65,39 @@ char editorReadKey();
 
 
 /*
+    Gets the cursor position in the terminal window, used for the fallback method of
+    getting the window size
+*/
+int getCursorPosition(int *rows, int *cols);
+
+
+/*
     Gets the size of the terminal window
 */
 int getWindowSize(int *rows, int *cols);
 
+
+/*--------------------------------------------------------------------------
+                               APPEND BUFFER
+--------------------------------------------------------------------------*/
+
+/*
+    Append buffer consisting of a pointer to the buffer, and a length
+*/
+struct aBuf {
+    char *b;
+    int len;
+};
+
+#define ABUF_INIT {NULL, 0} // Empty buffer
+
+/*
+*/
+void abAppend(struct aBuf *ab, const char *s, int len);
+
+/*
+*/
+void abFree(struct aBuf *ab);
 
 /*--------------------------------------------------------------------------
                                    OUTPUT
@@ -82,7 +112,7 @@ void editorRefreshScreen();
     Handles drawing each row of the buffer of text being edited.
     Current fraw a tilde ~ in each row, that row is not part of the file and can't contain text
 */
-void editorDrawRows();
+void editorDrawRows(struct aBuf *ab);
 
 
 /*--------------------------------------------------------------------------
