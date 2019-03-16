@@ -11,6 +11,15 @@
         "\r\n"
 */
 
+
+/*--------------------------------------------------------------------------
+                                DEFINTIONS
+--------------------------------------------------------------------------*/
+
+//0001 1111, Mirrors ctrl key in terminal, strips bits 5&6 from key pressed with ctrl, and sends that
+#define CTRL_KEY(k) ((k) &0x1f)
+
+
 // ------------Structs------------
 struct termios orig_termios;
 
@@ -34,3 +43,19 @@ void disableRawMode();
     Prints an error message and exits the program
 */
 void die(const char *s);
+
+/*
+    Waits for a keypress, and returns it
+*/
+char editorReadKey();
+
+
+/*
+    Waits for a keypress, then handles it
+*/
+void editorProcessKeyPress();
+
+/*
+
+*/
+void editorRefreshScreen();

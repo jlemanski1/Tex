@@ -6,6 +6,10 @@
 --------------------------------------------------------------------------*/
 
 void die(const char *s) {
+    // Clear screen
+    write(STDOUT_FILENO, "\x1b[2J", 4);
+    write(STDOUT_FILENO, "\x1b[H", 3);
+
     perror(s);  // Print descriptive error message
     exit(EXIT_FAILURE); // Exit
 }
@@ -49,6 +53,52 @@ void enableRawMode() {
 }
 
 
+char editorReadKey() {
+    int nRead;
+    char c;
+    // Read until EOF or ctrl-q, includes error handing
+    while ((nRead = read(STDIN_FILENO, &c, 1)) != 1) {
+        if (nRead == -1 && errno != EAGAIN)
+            die("read");
+    }
+    return c;
+}
+
+/*--------------------------------------------------------------------------
+                                   OUTPUT
+--------------------------------------------------------------------------*/
+
+void editorRefreshScreen() {
+    /*
+        \x1b - escape character, decimal: 27
+        J    - clear the screen
+        2    - specifically entire screen
+
+    */
+    write(STDOUT_FILENO, "\x1b[2J", 4); // Write 4 bytes
+    write(STDOUT_FILENO, "\x1b[H", 3);  // Reposition cursor to top left
+}
+
+
+/*--------------------------------------------------------------------------
+                                   INPUT
+--------------------------------------------------------------------------*/
+
+void editorProcessKeyPress() {
+    char c = editorReadKey();
+
+    switch (c)
+    {
+        // CTRL-Q sucessful exit
+        case CTRL_KEY('q'):
+            // Clear screen
+            write(STDOUT_FILENO, "\x1b[2J", 4);
+            write(STDOUT_FILENO, "\x1b[H", 3);
+            exit(EXIT_SUCCESS);
+            break;
+    }
+}
+
 
 /*--------------------------------------------------------------------------
                                    INIT
@@ -58,21 +108,8 @@ int main() {
     enableRawMode();
 
     while (1) {
-        char c = '\0';
-        // Error Handling
-        if (read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN)
-            die("read");
-
-        // Read byte by byte until EOF or user enters q
-        read(STDIN_FILENO, &c, 1);
-
-        // Check if char is a control character (is non-printable)
-        if (iscntrl(c)) {
-            printf("%d\r\n, c");  // Print ASCII value
-        } else {
-            printf("%d ('%c')\r\n", c, c);    // Print ASCII value & character
-        }
-        if (c == 'q') break;
+        editorRefreshScreen();
+        editorProcessKeyPress();
     }
 
     return 0;
