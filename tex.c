@@ -17,22 +17,21 @@ void die(const char *s) {
 
 void disableRawMode() {
     // Error Handling
-    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &E.orig_termios) == -1)
         die("tcsetattr");
 
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios); // Set terminal attributes back to default
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &E.orig_termios); // Set terminal attributes back to default
 }
 
 
 void enableRawMode() {
     // Error Handling
-    if (tcgetattr(STDIN_FILENO, &orig_termios) == -1)
+    if (tcgetattr(STDIN_FILENO, &E.orig_termios) == -1)
         die("tcgetattr");
 
-    tcgetattr(STDIN_FILENO, &orig_termios);         // Read terminal attributes into termios, raw
     atexit(disableRawMode); // Call disableRawMode automatically on program exit
 
-    struct termios raw = orig_termios;  // Make a copy of original terminal attributes
+    struct termios raw = E.orig_termios;  // Make a copy of original terminal attributes
 
     // Disable ctrl-(s&z&m) signals & other misc flags incase they're on by default
     raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
@@ -44,10 +43,6 @@ void enableRawMode() {
     // read() timeout
     raw.c_cc[VMIN] = 0;
     raw.c_cc[VTIME] = 1;
-
-    // Error Handling
-    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
-        die("tcsetattr");
 
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);   // Apply terminal attributes
 }
@@ -64,6 +59,20 @@ char editorReadKey() {
     return c;
 }
 
+
+int getWindowSize(int *rows, int *cols) {
+    struct winsize ws;
+
+    // On success, ioctl wil lpalce the num of cols and rows into the given winsize struct
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
+        return -1;
+    } else {
+        *cols = ws.ws_col;
+        *rows = ws.ws_row;
+        return 0;
+    }
+}
+
 /*--------------------------------------------------------------------------
                                    OUTPUT
 --------------------------------------------------------------------------*/
@@ -71,11 +80,12 @@ char editorReadKey() {
 void editorDrawRows() {
     int y;  // Terminal height
     // Draw 24 rows of ~
-    for(y = 0; y < 24; y++)
+    for(y = 0; y < E.screenRows; y++)
     {
         write(STDOUT_FILENO, "~\r\n", 3);
     }
 }
+
 
 void editorRefreshScreen() {
     /*
@@ -117,8 +127,14 @@ void editorProcessKeyPress() {
                                    INIT
 --------------------------------------------------------------------------*/
 
+void initEditor() {
+    if (getWindowSize(&E.screenRows, &E.screenCols) == -1)
+        die("getWindowSize");
+}
+
 int main() {
     enableRawMode();
+    initEditor();
 
     while (1) {
         editorRefreshScreen();

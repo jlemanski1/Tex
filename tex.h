@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <errno.h>
+#include <sys/ioctl.h>
 
 /*
     *NOTE*:
@@ -20,11 +21,23 @@
 #define CTRL_KEY(k) ((k) &0x1f)
 
 
-// ------------Structs------------
-struct termios orig_termios;
+/*--------------------------------------------------------------------------
+                                   DATA
+--------------------------------------------------------------------------*/
+struct editorConfig {
+    // Terminal Size
+    int screenRows;
+    int screenCols;
+
+    struct termios orig_termios;
+};
+
+struct editorConfig E;
 
 
-// ------------Function Prototypes------------
+/*--------------------------------------------------------------------------
+                                  TERMINAL
+--------------------------------------------------------------------------*/
 
 /*
     Set terminal to raw mode from canonical by disabling the required flags. Terminal won't
@@ -51,9 +64,14 @@ char editorReadKey();
 
 
 /*
-    Waits for a keypress, then handles it
+    Gets the size of the terminal window
 */
-void editorProcessKeyPress();
+int getWindowSize(int *rows, int *cols);
+
+
+/*--------------------------------------------------------------------------
+                                   OUTPUT
+--------------------------------------------------------------------------*/
 
 /*
 
@@ -65,3 +83,23 @@ void editorRefreshScreen();
     Current fraw a tilde ~ in each row, that row is not part of the file and can't contain text
 */
 void editorDrawRows();
+
+
+/*--------------------------------------------------------------------------
+                                   INPUT
+--------------------------------------------------------------------------*/
+
+/*
+    Waits for a keypress, then handles it
+*/
+void editorProcessKeyPress();
+
+
+/*--------------------------------------------------------------------------
+                                   INIT
+--------------------------------------------------------------------------*/
+
+/*
+    Initialize all the fields in the E struct
+*/
+void initEditor();
