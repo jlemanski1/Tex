@@ -126,7 +126,7 @@ void abAppend(struct aBuf *ab, const char *s, int len) {
 }
 
 void abFree(struct aBuf *ab) {
-    free(ab->b);
+    free(ab->b);    // Free char pointer
 }
 
 
@@ -136,14 +136,23 @@ void abFree(struct aBuf *ab) {
 
 void editorDrawRows(struct aBuf *ab) {
     int y;  // Terminal height
-    // Draw 24 rows of ~
+    // Draw rows of ~ for entire terminal window
     for(y = 0; y < E.screenRows; y++) {
         // Display welcome message
         if (y == E.screenRows / 3) {
             char welcome[80];
-            int welcomeLen = snprintf(welcome, sizeof(welcome), "\tTex Editor\n\t\tversion: %s", TEX_VERSION);
+            int welcomeLen = snprintf(welcome, sizeof(welcome), "\tTex Editor -- version: %s", TEX_VERSION);
             if (welcomeLen > E.screenCols)
                 welcomeLen = E.screenCols;
+            
+            // Add welcome message padding
+            int padding = (E.screenCols - welcomeLen) / 2;  // Centre
+            if (padding) {
+                abAppend(ab, "~", 1);
+                padding--;
+            }
+            while (padding--)
+                abAppend(ab, " ", 1);
             
             abAppend(ab, welcome, welcomeLen);
         } else {
@@ -170,13 +179,16 @@ void editorRefreshScreen() {
     abAppend(&ab, "\x1b[2J", 4);
     */
 
-    abAppend(&ab, "\x1b[?25l", 6);  // Show Cursor
+    abAppend(&ab, "\x1b[?25l", 6);  // Show Mouse Cursor
     abAppend(&ab, "\x1b[H", 3);  // Reposition cursor to top left
 
     editorDrawRows(&ab);
 
-    abAppend(&ab, "\x1b[H", 3);
-    abAppend(&ab, "\x1b[?25h", 6);  // Hide Cursor
+    char buf[32];
+    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);  // Add 1 to convert from 0 based C to 1 based terminal
+    abAppend(&ab, buf, strlen(buf));
+
+    abAppend(&ab, "\x1b[?25h", 6);  // Hide Mouse Cursor
 
     write(STDOUT_FILENO, ab.b, ab.len);
     abFree(&ab);
@@ -186,6 +198,25 @@ void editorRefreshScreen() {
 /*--------------------------------------------------------------------------
                                    INPUT
 --------------------------------------------------------------------------*/
+
+void editorMoveCursor(char key) {
+    switch (key)
+    {
+        case 'a':
+            E.cx--;
+            break;
+        case 'd':
+            E.cx++;
+            break;
+        case 'w':
+            E.cy--;
+            break;
+        case 's':
+            E.cy++;
+            break;
+    }
+}
+
 
 void editorProcessKeyPress() {
     char c = editorReadKey();
@@ -199,6 +230,13 @@ void editorProcessKeyPress() {
             write(STDOUT_FILENO, "\x1b[H", 3);
             exit(EXIT_SUCCESS);
             break;
+
+        case 'w':
+        case 's':
+        case 'a':
+        case 'd':
+            editorMoveCursor(c);
+            break;
     }
 }
 
@@ -208,6 +246,11 @@ void editorProcessKeyPress() {
 --------------------------------------------------------------------------*/
 
 void initEditor() {
+    // Set Cursor pos to top left
+    E.cx = 0;
+    E.cy = 0;
+
+    // Error Handling
     if (getWindowSize(&E.screenRows, &E.screenCols) == -1)
         die("getWindowSize");
 }

@@ -22,12 +22,15 @@
 #define CTRL_KEY(k) ((k) &0x1f)
 
 // Version number
-#define TEX_VERSION "0.01"
+#define TEX_VERSION "0.02"
 
 /*--------------------------------------------------------------------------
                                    DATA
 --------------------------------------------------------------------------*/
 struct editorConfig {
+    // Cursor Pos
+    int cx, cy;
+
     // Terminal Size
     int screenRows;
     int screenCols;
@@ -120,6 +123,12 @@ void editorDrawRows(struct aBuf *ab);
 /*--------------------------------------------------------------------------
                                    INPUT
 --------------------------------------------------------------------------*/
+
+/*
+    Allows the user move the curor using WASD keys
+*/
+void editorMoveCursor(char key);
+
 
 /*
     Waits for a keypress, then handles it
