@@ -21,6 +21,8 @@
 //0001 1111, Mirrors ctrl key in terminal, strips bits 5&6 from key pressed with ctrl, and sends that
 #define CTRL_KEY(k) ((k) &0x1f)
 
+// Version number
+#define TEX_VERSION "0.01"
 
 /*--------------------------------------------------------------------------
                                    DATA

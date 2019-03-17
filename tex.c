@@ -138,8 +138,19 @@ void editorDrawRows(struct aBuf *ab) {
     int y;  // Terminal height
     // Draw 24 rows of ~
     for(y = 0; y < E.screenRows; y++) {
-        abAppend(ab, "~", 1);
+        // Display welcome message
+        if (y == E.screenRows / 3) {
+            char welcome[80];
+            int welcomeLen = snprintf(welcome, sizeof(welcome), "\tTex Editor\n\t\tversion: %s", TEX_VERSION);
+            if (welcomeLen > E.screenCols)
+                welcomeLen = E.screenCols;
+            
+            abAppend(ab, welcome, welcomeLen);
+        } else {
+            abAppend(ab, "~", 1);   //Append line tildes
+        }
 
+        abAppend(ab, "\x1b[K", 3);  // Escaape K sequence at end of each line
         // Make the last line an exception for the carriage return and newline
         if (y < E.screenRows - 1) {
             abAppend(ab, "\r\n", 2);
@@ -156,13 +167,16 @@ void editorRefreshScreen() {
         J    - clear the screen
         2    - specifically entire screen
 
-    */
     abAppend(&ab, "\x1b[2J", 4);
+    */
+
+    abAppend(&ab, "\x1b[?25l", 6);  // Show Cursor
     abAppend(&ab, "\x1b[H", 3);  // Reposition cursor to top left
 
     editorDrawRows(&ab);
 
     abAppend(&ab, "\x1b[H", 3);
+    abAppend(&ab, "\x1b[?25h", 6);  // Hide Cursor
 
     write(STDOUT_FILENO, ab.b, ab.len);
     abFree(&ab);
