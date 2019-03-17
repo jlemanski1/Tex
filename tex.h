@@ -29,7 +29,12 @@ enum editorKey {
     ARROW_LEFT = 1000,  //out of range of a char so arrows don't conflict with ordinary keys
     ARROW_RIGHT,
     ARROW_UP,
-    ARROW_DOWN
+    ARROW_DOWN,
+    DEL_KEY,
+    HOME_KEY,
+    END_KEY,
+    PAGE_UP,
+    PAGE_DOWN
 };
 
 /*--------------------------------------------------------------------------
