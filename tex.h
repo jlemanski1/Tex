@@ -1,3 +1,7 @@
+#define _DEFAULT_SOURCE
+#define _BSD_SOURCE
+#define _GNU_SOURCE
+
 #include <termios.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -5,6 +9,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
 #include <string.h>
 
 /*
@@ -40,13 +45,22 @@ enum editorKey {
 /*--------------------------------------------------------------------------
                                    DATA
 --------------------------------------------------------------------------*/
+
+// Stors a row of text in the editor
+typedef struct erow {
+    int size;
+    char *chars;
+} erow;
+
 struct editorConfig {
     // Cursor Pos
     int cx, cy;
-
     // Terminal Size
     int screenRows;
     int screenCols;
+    // Editor Rows
+    int numrows;
+    erow row;
 
     struct termios orig_termios;
 };
@@ -93,6 +107,16 @@ int getCursorPosition(int *rows, int *cols);
     Gets the size of the terminal window
 */
 int getWindowSize(int *rows, int *cols);
+
+
+/*--------------------------------------------------------------------------
+                                 FILE IO
+--------------------------------------------------------------------------*/
+
+/*
+    Opens and reads a file from disk
+*/
+void editorOpen(char *filename);
 
 
 /*--------------------------------------------------------------------------
