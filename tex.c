@@ -48,15 +48,44 @@ void enableRawMode() {
 }
 
 
-char editorReadKey() {
+int editorReadKey() {
     int nRead;
     char c;
-    // Read until EOF or ctrl-q, includes error handing
+    // Read until ctrl-q
     while ((nRead = read(STDIN_FILENO, &c, 1)) != 1) {
+        // Handle Errors
         if (nRead == -1 && errno != EAGAIN)
             die("read");
     }
-    return c;
+
+    // Handle multi-byte keys as input
+    if (c == '\x1b') {
+        char seq[3];
+
+        if (read(STDIN_FILENO, &seq[0], 1) != 1)
+            return '\x1b';
+        if (read(STDIN_FILENO, &seq[1], 1) != 1)
+            return '\x1b';
+        
+        if (seq[0] == '[') {
+            switch (seq[1])
+            {
+                // Arrow key Input
+                case 'A':
+                    return ARROW_UP;
+                case 'B':
+                    return ARROW_DOWN;
+                case 'C':
+                    return ARROW_RIGHT;
+                case 'D':
+                    return ARROW_LEFT;
+            }
+        }
+        return '\x1b';
+        
+    } else {
+        return c;
+    }
 }
 
 int getCursorPosition(int *rows, int *cols) {
@@ -171,14 +200,6 @@ void editorDrawRows(struct aBuf *ab) {
 void editorRefreshScreen() {
     struct aBuf ab = ABUF_INIT;
 
-    /*
-        \x1b - escape character, decimal: 27
-        J    - clear the screen
-        2    - specifically entire screen
-
-    abAppend(&ab, "\x1b[2J", 4);
-    */
-
     abAppend(&ab, "\x1b[?25l", 6);  // Show Mouse Cursor
     abAppend(&ab, "\x1b[H", 3);  // Reposition cursor to top left
 
@@ -199,27 +220,31 @@ void editorRefreshScreen() {
                                    INPUT
 --------------------------------------------------------------------------*/
 
-void editorMoveCursor(char key) {
+void editorMoveCursor(int key) {
     switch (key)
     {
-        case 'a':
-            E.cx--;
+        case ARROW_LEFT:
+            if (E.cx != 0)
+                E.cx--;
             break;
-        case 'd':
-            E.cx++;
+        case ARROW_RIGHT:
+            if (E.cx != E.screenCols - 1)
+                E.cx++;
             break;
-        case 'w':
-            E.cy--;
+        case ARROW_UP:
+            if (E.cy != 0)
+                E.cy--;
             break;
-        case 's':
-            E.cy++;
+        case ARROW_DOWN:
+            if (E.cy != E.screenRows - 1)
+                E.cy++;
             break;
     }
 }
 
 
 void editorProcessKeyPress() {
-    char c = editorReadKey();
+    int c = editorReadKey();
 
     switch (c)
     {
@@ -231,10 +256,10 @@ void editorProcessKeyPress() {
             exit(EXIT_SUCCESS);
             break;
 
-        case 'w':
-        case 's':
-        case 'a':
-        case 'd':
+        case ARROW_UP:
+        case ARROW_DOWN:
+        case ARROW_LEFT:
+        case ARROW_RIGHT:
             editorMoveCursor(c);
             break;
     }

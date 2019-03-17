@@ -24,6 +24,14 @@
 // Version number
 #define TEX_VERSION "0.02"
 
+// Arrow Key constants
+enum editorKey {
+    ARROW_LEFT = 1000,  //out of range of a char so arrows don't conflict with ordinary keys
+    ARROW_RIGHT,
+    ARROW_UP,
+    ARROW_DOWN
+};
+
 /*--------------------------------------------------------------------------
                                    DATA
 --------------------------------------------------------------------------*/
@@ -66,7 +74,7 @@ void die(const char *s);
 /*
     Waits for a keypress, and returns it
 */
-char editorReadKey();
+int editorReadKey();
 
 
 /*
@@ -127,7 +135,7 @@ void editorDrawRows(struct aBuf *ab);
 /*
     Allows the user move the curor using WASD keys
 */
-void editorMoveCursor(char key);
+void editorMoveCursor(int key);
 
 
 /*
