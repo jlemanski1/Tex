@@ -28,7 +28,7 @@ TBA
 
   ```bash
   ./Tex            # Open Tex to new file
-  ./Tex Test.txt   # Open file Test.txt in Tex
+  ./Tex test.txt   # Open file test.txt in Tex
   ...
   ```
 
