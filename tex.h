@@ -29,7 +29,7 @@
 #define CTRL_KEY(k) ((k) &0x1f)
 
 // Version number
-#define TEX_VERSION "0.02"
+#define TEX_VERSION "0.05"
 
 // Tab Stop Constant
 #define TEX_TAB_STOP 8
