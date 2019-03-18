@@ -1,6 +1,8 @@
 # Tex
 
-Tex is a minimalist text editor for bash terminals, written in c, with no dependencies.
+Tex is a minimalist text editor for bash terminals, written in c, with no dependencies. The reason for this project
+is to have a fun way to implement all the knowledge I've recently learned in school. Since my school projects have 
+been less excited, a 64Kb Memory allocator for a recent example.
 
 ## Installation
 
