@@ -174,6 +174,26 @@ int getWindowSize(int *rows, int *cols) {
 
 
 /*--------------------------------------------------------------------------
+                            ROW OPERATIONS
+--------------------------------------------------------------------------*/
+
+void editorAppendRow(char *s, size_t len) {
+    E.row = realloc(E.row, sizeof(erow) * (E.numrows + 1)); // Reallocate space for new row
+
+    int at = E.numrows;
+    E.row[at].size = len;
+    E.row[at].chars = malloc(len + 1);
+
+    if (E.row[0].chars == NULL)
+        die("E.row.chars malloc failed");
+
+    memcpy(E.row[at].chars, s, len);
+    E.row[at].chars[len] = '\0';
+    E.numrows++;
+}
+
+
+/*--------------------------------------------------------------------------
                                  FILE IO
 --------------------------------------------------------------------------*/
 
@@ -184,22 +204,13 @@ void editorOpen(char *filename) {
 
     char *line = NULL;
     size_t linecap = 0;
-    ssize_t linelen = getline(&line, &linecap, fp);
+    ssize_t linelen;
 
-    if (linelen != -1) {
-        while (linelen > 0 && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r')) {
+    if ((linelen = getline(&line, &linecap, fp)) != -1) {
+        while (linelen > 0 && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r'))
             linelen--;
-        }
-
-        E.row.size = linelen;
-        E.row.chars = malloc(linelen + 1);
-        if (E.row.chars == NULL) {
-            die("E.row.chars malloc failed");
-
-        memcpy(E.row.chars, line, linelen);
-        E.row.chars[linelen] = '\0';
-        E.numrows = 1;
-        }
+        
+        editorAppendRow(line, linelen);   
     }
     free(line);
     fclose(fp);
@@ -257,11 +268,11 @@ void editorDrawRows(struct aBuf *ab) {
                 abAppend(ab, "~", 1);   //Append line tildes
             }
         } else {
-            int len = E.row.size;
+            int len = E.row[y].size;
             if (len > E.screenCols)
                 len = E.screenCols;
             
-            abAppend(ab, E.row.chars, len);
+            abAppend(ab, E.row[y].chars, len);
         }
 
         abAppend(ab, "\x1b[K", 3);  // Escaape K sequence at end of each line
@@ -368,6 +379,7 @@ void initEditor() {
     E.cy = 0;
 
     E.numrows = 0;
+    E.row = NULL;
 
     // Error Handling
     if (getWindowSize(&E.screenRows, &E.screenCols) == -1)
