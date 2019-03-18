@@ -11,6 +11,8 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <string.h>
+#include <time.h>
+#include <stdarg.h>
 
 /*
     *NOTE*:
@@ -71,7 +73,10 @@ struct editorConfig {
     // Editor Rows
     int numrows;
     erow *row;
+    // Status Bar
     char *filename; // Filename, for status bar
+    char statusmsg[80];
+    time_t statusmsgTime;
 
     struct termios orig_termios;
 };
@@ -200,6 +205,17 @@ void editorDrawStatusBar(struct aBuf *ab);
 
 */
 void editorRefreshScreen();
+
+/*
+    Variadic function(takes any number of args), Prints a stauts message below the status
+    bar notifying users of saves, erros, etc.
+*/
+void editorSetStatusMessage(const char *fmt, ...);
+
+/*
+    Updates the status bar message
+*/
+void editorDrawMessageBar(struct aBuf *ab);
 
 
 /*--------------------------------------------------------------------------

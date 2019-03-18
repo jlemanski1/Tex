@@ -394,6 +394,27 @@ void editorDrawStatusBar(struct aBuf *ab) {
         }
     }
     abAppend(ab, "\x1b[m", 3);
+    abAppend(ab, "\r\n", 2);    // Add space for status bar message
+}
+
+
+void editorSetStatusMessage(const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(E.statusmsg, sizeof(E.statusmsg), fmt, ap);
+    va_end(ap);
+    E.statusmsgTime = time(NULL);
+}
+
+
+void editorDrawMessageBar(struct aBuf *ab) {
+    abAppend(ab, "\x1b[K", 3);  // Clear the message bar
+    int msglen = strlen(E.statusmsg);
+    if (msglen > E.screenCols)
+        msglen = E.screenCols;
+    // Display msg to bar if its less than 5 secs old
+    if (msglen && time(NULL) - E.statusmsgTime < 5)
+        abAppend(ab, E.statusmsg, msglen);
 }
 
 
@@ -407,6 +428,7 @@ void editorRefreshScreen() {
 
     editorDrawRows(&ab);        // Draw Rows
     editorDrawStatusBar(&ab);   // Draw Status bar
+    editorDrawMessageBar(&ab);  // Update status bar message
 
     char buf[32];
     snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowOff) + 1, (E.rx - E.colOff) + 1);  // Add 1 to convert from 0 based C to 1 based terminal
@@ -537,13 +559,17 @@ void initEditor() {
 
     E.numrows = 0;
     E.row = NULL;
+
+    // Initialize Status bar
     E.filename = NULL;
+    E.statusmsg[0] = '\0';
+    E.statusmsgTime = 0;
 
     // Error Handling
     if (getWindowSize(&E.screenRows, &E.screenCols) == -1)
         die("getWindowSize");
 
-    E.screenRows -= 1;  // Make room for the status bar
+    E.screenRows -= 2;  // Make room for the status bar & status message
 }
 
 int main(int argc, char *argv[]) {
@@ -552,6 +578,8 @@ int main(int argc, char *argv[]) {
     if (argc >= 2) {
         editorOpen(argv[1]);
     }
+
+    editorSetStatusMessage("HELP: Ctrl-Q 'quit'");  // Set initial status message
 
     while (1) {
         editorRefreshScreen();
