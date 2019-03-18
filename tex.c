@@ -253,6 +253,16 @@ void editorScroll() {
     if (E.cy >= E.rowOff + E.screenRows) {
         E.rowOff = E.cy - E.screenRows + 1; // Scroll just past bottom of screen, but not past EOF
     }
+
+    // Cursor is left of visible window
+    if (E.cx < E.colOff) {
+        E.colOff = E.cx;
+    }
+
+    // Cursor is right of visible window
+    if (E.cx >= E.colOff + E.screenCols) {
+        E.colOff = E.cx - E.screenCols + 1;
+    }
 }
 
 void editorDrawRows(struct aBuf *ab) {
@@ -282,11 +292,14 @@ void editorDrawRows(struct aBuf *ab) {
                 abAppend(ab, "~", 1);   //Append line tildes
             }
         } else {
-            int len = E.row[fileRow].size;
+            int len = E.row[fileRow].size - E.colOff;
+            // Set len to 0 incase its negative
+            if (len < 0)
+                len = 0;
             if (len > E.screenCols)
                 len = E.screenCols;
             
-            abAppend(ab, E.row[fileRow].chars, len);
+            abAppend(ab, &E.row[fileRow].chars[E.colOff], len);
         }
 
         abAppend(ab, "\x1b[K", 3);  // Escaape K sequence at end of each line
@@ -309,7 +322,7 @@ void editorRefreshScreen() {
     editorDrawRows(&ab);
 
     char buf[32];
-    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowOff) + 1, E.cx + 1);  // Add 1 to convert from 0 based C to 1 based terminal
+    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowOff) + 1, (E.cx - E.colOff) + 1);  // Add 1 to convert from 0 based C to 1 based terminal
     abAppend(&ab, buf, strlen(buf));
 
     abAppend(&ab, "\x1b[?25h", 6);  // Hide Mouse Cursor
@@ -324,25 +337,50 @@ void editorRefreshScreen() {
 --------------------------------------------------------------------------*/
 
 void editorMoveCursor(int key) {
+    erow *row = (E.cy >= E.numrows) ? NULL : &E.row[E.cy];
+
     switch (key)
     {
         case ARROW_LEFT:
-            if (E.cx != 0)
+            // Move cursor left
+            if (E.cx != 0) {
                 E.cx--;
+            // If at start of line, go to end of prev line
+            } else if (E.cy > 0) {
+                E.cy--;
+                E.cx = E.row[E.cy].size;
+            }
             break;
         case ARROW_RIGHT:
-            if (E.cx != E.screenCols - 1)
+            // Check if cursor is to the left of the end of the line
+            // Move cursor right
+            if (row && E.cx < row->size) {
                 E.cx++;
+            // Move cursor to beginning of next line
+            } else if (row && E.cx == row->size) {
+                E.cy++;
+                E.cx = 0;
+            }
             break;
         case ARROW_UP:
-            if (E.cy != 0)
+            // Move cursor up a line
+            if (E.cy != 0) {
                 E.cy--;
+            }
             break;
         case ARROW_DOWN:
+            // Move cursor down a line
             if (E.cy < E.numrows)
                 E.cy++;
             break;
     }
+
+    // Snap cursor to end of line in case it ends up past it
+    row = (E.cy >= E.numrows) ? NULL : &E.row[E.cy];
+    int rowLen = row ? row->size : 0;
+    if (E.cx > rowLen)
+        E.cx = rowLen;
+
 }
 
 
@@ -393,8 +431,11 @@ void initEditor() {
     // Set Cursor pos to top left
     E.cx = 0;
     E.cy = 0;
+    
+    // Default scroll to top left
+    E.rowOff = 0;
+    E.colOff = 0;
 
-    E.rowOff = 0;   // Default scroll to top
     E.numrows = 0;
     E.row = NULL;
 

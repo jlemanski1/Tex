@@ -58,8 +58,9 @@ struct editorConfig {
     // Terminal Size
     int screenRows;
     int screenCols;
-    // Row Offset
+    // Row & Column Offset
     int rowOff;
+    int colOff;
     // Editor Rows
     int numrows;
     erow *row;
@@ -145,10 +146,12 @@ struct aBuf {
 #define ABUF_INIT {NULL, 0} // Empty buffer
 
 /*
+    Append a string to the append buffer
 */
 void abAppend(struct aBuf *ab, const char *s, int len);
 
 /*
+    Free the append buffer
 */
 void abFree(struct aBuf *ab);
 
