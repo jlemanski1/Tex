@@ -60,6 +60,8 @@ typedef struct erow {
 struct editorConfig {
     // Cursor Pos
     int cx, cy;
+    // When no tabs on current line, rx = cx, when line has tabs, rx will be greater by the num of spaces the tabs take up
+    int rx;
     // Terminal Size
     int screenRows;
     int screenCols;
@@ -120,6 +122,12 @@ int getWindowSize(int *rows, int *cols);
 /*--------------------------------------------------------------------------
                             ROW OPERATIONS
 --------------------------------------------------------------------------*/
+
+/*
+    Converts a chars index to a render index, loops through all chars to the left of cx,
+    to figure out how many spaces each tab takes up
+*/
+int editorRowCxToRx(erow *row, int cx);
 
 /*
     Uses the chars string of an erow to fill in the contents of the render string

@@ -177,6 +177,20 @@ int getWindowSize(int *rows, int *cols) {
                             ROW OPERATIONS
 --------------------------------------------------------------------------*/
 
+int editorRowCxToRx(erow *row, int cx) {
+    int rx = 0;
+    int j;
+
+    for (j = 0; j < cx; j++) {
+        if (row->chars[j] == '\t')
+            // How many columns cursor is to the left of the tab stop, add to rx
+            rx += (TEX_TAB_STOP - 1) - (rx % TEX_TAB_STOP);
+        rx++;
+    }
+    return rx;
+}
+
+
 void editorUpdateRow(erow *row) {
     int tabs = 0;
     int j;
@@ -279,6 +293,12 @@ void abFree(struct aBuf *ab) {
 --------------------------------------------------------------------------*/
 
 void editorScroll() {
+    E.rx = 0;
+    // Set rx
+    if (E.cy < E.numrows) {
+        E.rx = editorRowCxToRx(&E.row[E.cy], E.cx);
+    }
+
     // Cursor is above visible window
     if (E.cy < E.rowOff) {
         E.rowOff = E.cy;    // Scroll to where cursor is
@@ -290,15 +310,16 @@ void editorScroll() {
     }
 
     // Cursor is left of visible window
-    if (E.cx < E.colOff) {
-        E.colOff = E.cx;
+    if (E.rx < E.colOff) {
+        E.colOff = E.rx;
     }
 
     // Cursor is right of visible window
-    if (E.cx >= E.colOff + E.screenCols) {
-        E.colOff = E.cx - E.screenCols + 1;
+    if (E.rx >= E.colOff + E.screenCols) {
+        E.colOff = E.rx - E.screenCols + 1;
     }
 }
+
 
 void editorDrawRows(struct aBuf *ab) {
     int y;  // Terminal height
@@ -357,7 +378,7 @@ void editorRefreshScreen() {
     editorDrawRows(&ab);
 
     char buf[32];
-    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowOff) + 1, (E.cx - E.colOff) + 1);  // Add 1 to convert from 0 based C to 1 based terminal
+    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowOff) + 1, (E.rx - E.colOff) + 1);  // Add 1 to convert from 0 based C to 1 based terminal
     abAppend(&ab, buf, strlen(buf));
 
     abAppend(&ab, "\x1b[?25h", 6);  // Hide Mouse Cursor
@@ -466,7 +487,8 @@ void initEditor() {
     // Set Cursor pos to top left
     E.cx = 0;
     E.cy = 0;
-    
+    E.rx = 0;
+
     // Default scroll to top left
     E.rowOff = 0;
     E.colOff = 0;
