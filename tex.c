@@ -463,6 +463,16 @@ void editorProcessKeyPress() {
         case PAGE_UP:   // Move cursor to top edge
         case PAGE_DOWN: // Move cursor to bottom edge
             {
+                // Scroll Entire Page
+                if (c == PAGE_UP) {
+                    E.cy = E.rowOff;
+                } else if (c == PAGE_DOWN) {
+                    E.cy = E.rowOff + E.screenRows - 1;
+                    if (E.cy > E.numrows)
+                        E.cy = E.numrows;
+                }
+
+                // Scroll to bottom of page
                 int times = E.screenRows;
                 while (times--)
                     editorMoveCursor(c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
