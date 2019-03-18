@@ -177,6 +177,36 @@ int getWindowSize(int *rows, int *cols) {
                             ROW OPERATIONS
 --------------------------------------------------------------------------*/
 
+void editorUpdateRow(erow *row) {
+    int tabs = 0;
+    int j;
+
+    // Count the tabs to calc the memory required for render
+    for (j = 0; j< row->size; j++) {
+        if (row->chars[j] == '\t')
+            tabs++;
+    }
+
+    free(row->render);  // Free any previous renders
+    row->render = malloc(row->size + tabs * (TEX_TAB_STOP - 1) + 1); //Allocate memory for new render
+    
+    int idx = 0;    // Number of characters copied into row->render
+
+    for (j = 0; j < row->size; j++) {
+        if (row->chars[j] == '\t') {
+            row->render[idx++] = ' ';
+            while (idx % TEX_TAB_STOP != 0)
+                row->render[idx++] = ' ';
+
+        } else {
+            row->render[idx++] = row->chars[j];
+        }
+    }
+    row->render[idx] = '\0';
+    row->rSize = idx;
+}
+
+
 void editorAppendRow(char *s, size_t len) {
     E.row = realloc(E.row, sizeof(erow) * (E.numrows + 1)); // Reallocate space for new row
 
@@ -189,6 +219,11 @@ void editorAppendRow(char *s, size_t len) {
 
     memcpy(E.row[at].chars, s, len);
     E.row[at].chars[len] = '\0';
+
+    E.row[at].rSize = 0;
+    E.row[at].render = NULL;
+    editorUpdateRow(&E.row[at]);
+
     E.numrows++;
 }
 
@@ -292,14 +327,14 @@ void editorDrawRows(struct aBuf *ab) {
                 abAppend(ab, "~", 1);   //Append line tildes
             }
         } else {
-            int len = E.row[fileRow].size - E.colOff;
+            int len = E.row[fileRow].rSize - E.colOff;
             // Set len to 0 incase its negative
             if (len < 0)
                 len = 0;
             if (len > E.screenCols)
                 len = E.screenCols;
             
-            abAppend(ab, &E.row[fileRow].chars[E.colOff], len);
+            abAppend(ab, &E.row[fileRow].render[E.colOff], len);
         }
 
         abAppend(ab, "\x1b[K", 3);  // Escaape K sequence at end of each line

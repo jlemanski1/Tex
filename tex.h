@@ -29,6 +29,9 @@
 // Version number
 #define TEX_VERSION "0.02"
 
+// Tab Stop Constant
+#define TEX_TAB_STOP 8
+
 // Arrow Key constants
 enum editorKey {
     ARROW_LEFT = 1000,  //out of range of a char so arrows don't conflict with ordinary keys
@@ -49,7 +52,9 @@ enum editorKey {
 // Stors a row of text in the editor
 typedef struct erow {
     int size;
+    int rSize;  // Size of the contents of render
     char *chars;
+    char *render;
 } erow;
 
 struct editorConfig {
@@ -115,6 +120,11 @@ int getWindowSize(int *rows, int *cols);
 /*--------------------------------------------------------------------------
                             ROW OPERATIONS
 --------------------------------------------------------------------------*/
+
+/*
+    Uses the chars string of an erow to fill in the contents of the render string
+*/
+void editorUpdateRow(erow *row);
 
 /*
 
