@@ -247,6 +247,9 @@ void editorAppendRow(char *s, size_t len) {
 --------------------------------------------------------------------------*/
 
 void editorOpen(char *filename) {
+    free(E.filename);   // Free prev filename
+    E.filename = strdup(filename);  // Duplicate filename, returns identical malloc-ed string
+
     FILE *fp = fopen(filename, "r");
     if (!fp)
         die("fopen");
@@ -360,10 +363,37 @@ void editorDrawRows(struct aBuf *ab) {
 
         abAppend(ab, "\x1b[K", 3);  // Escaape K sequence at end of each line
         // Make the last line an exception for the carriage return and newline
-        if (y < E.screenRows - 1) {
-            abAppend(ab, "\r\n", 2);
+        
+        abAppend(ab, "\r\n", 2);
+        
+    }
+}
+
+
+void editorDrawStatusBar(struct aBuf *ab) {
+    abAppend(ab, "\x1b[7m", 4);     // Invert status bar colours [7m
+    char status[80], rStatus[80];
+    // Cut string short if it doesn't fit, display [No Name] if there's no filename
+    int len = snprintf(status, sizeof(status), "%.20s - %d lines",
+        E.filename ? E.filename: "[No Name]", E.numrows);
+    
+    int rLen = snprintf(rStatus, sizeof(rStatus), "%d/%d", E.cy + 1, E.numrows);
+
+    if (len > E.screenCols)
+        len = E.screenCols;
+    abAppend(ab, status, len);
+    
+    while (len < E.screenCols) {
+        // Display current line number on right edge
+        if (E.screenCols - len == rLen) {
+            abAppend(ab, rStatus, rLen);
+            break;
+        } else {
+            abAppend(ab, " ", 1);
+            len++;
         }
     }
+    abAppend(ab, "\x1b[m", 3);
 }
 
 
@@ -375,7 +405,8 @@ void editorRefreshScreen() {
     abAppend(&ab, "\x1b[?25l", 6);  // Show Mouse Cursor
     abAppend(&ab, "\x1b[H", 3);  // Reposition cursor to top left
 
-    editorDrawRows(&ab);
+    editorDrawRows(&ab);        // Draw Rows
+    editorDrawStatusBar(&ab);   // Draw Status bar
 
     char buf[32];
     snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowOff) + 1, (E.rx - E.colOff) + 1);  // Add 1 to convert from 0 based C to 1 based terminal
@@ -506,10 +537,13 @@ void initEditor() {
 
     E.numrows = 0;
     E.row = NULL;
+    E.filename = NULL;
 
     // Error Handling
     if (getWindowSize(&E.screenRows, &E.screenCols) == -1)
         die("getWindowSize");
+
+    E.screenRows -= 1;  // Make room for the status bar
 }
 
 int main(int argc, char *argv[]) {

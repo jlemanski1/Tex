@@ -71,6 +71,7 @@ struct editorConfig {
     // Editor Rows
     int numrows;
     erow *row;
+    char *filename; // Filename, for status bar
 
     struct termios orig_termios;
 };
@@ -188,6 +189,12 @@ void editorScroll();
     Current fraw a tilde ~ in each row, that row is not part of the file and can't contain text
 */
 void editorDrawRows(struct aBuf *ab);
+
+/*
+    Draws the status bar to show useful info like the filename, the line count, the current
+    line number, a modified-since-last-saved marker, and the filetype (FUTURE)
+*/
+void editorDrawStatusBar(struct aBuf *ab);
 
 /*
 
