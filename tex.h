@@ -58,6 +58,8 @@ struct editorConfig {
     // Terminal Size
     int screenRows;
     int screenCols;
+    // Row Offset
+    int rowOff;
     // Editor Rows
     int numrows;
     erow *row;
@@ -155,15 +157,21 @@ void abFree(struct aBuf *ab);
 --------------------------------------------------------------------------*/
 
 /*
-
+    Checks if the cursor has moved outside of the visible window, and adjusts E.rowOff so
+    that the cursor is just inside the visible window
 */
-void editorRefreshScreen();
+void editorScroll();
 
 /*
     Handles drawing each row of the buffer of text being edited.
     Current fraw a tilde ~ in each row, that row is not part of the file and can't contain text
 */
 void editorDrawRows(struct aBuf *ab);
+
+/*
+
+*/
+void editorRefreshScreen();
 
 
 /*--------------------------------------------------------------------------

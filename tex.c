@@ -206,7 +206,8 @@ void editorOpen(char *filename) {
     size_t linecap = 0;
     ssize_t linelen;
 
-    if ((linelen = getline(&line, &linecap, fp)) != -1) {
+    // Read until EOFs
+    while ((linelen = getline(&line, &linecap, fp)) != -1) {
         while (linelen > 0 && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r'))
             linelen--;
         
@@ -242,11 +243,24 @@ void abFree(struct aBuf *ab) {
                                    OUTPUT
 --------------------------------------------------------------------------*/
 
+void editorScroll() {
+    // Cursor is above visible window
+    if (E.cy < E.rowOff) {
+        E.rowOff = E.cy;    // Scroll to where cursor is
+    }
+
+    // Cursor is past bottom of visible window
+    if (E.cy >= E.rowOff + E.screenRows) {
+        E.rowOff = E.cy - E.screenRows + 1; // Scroll just past bottom of screen, but not past EOF
+    }
+}
+
 void editorDrawRows(struct aBuf *ab) {
     int y;  // Terminal height
     // Draw rows of ~ for entire terminal window
     for(y = 0; y < E.screenRows; y++) {
-        if (y >= E.numrows) {
+        int fileRow = y + E.rowOff;
+        if (fileRow >= E.numrows) {
             if (E.numrows == 0 && y == E.screenRows / 3) {
                 // Display welcome message
                 char welcome[80];
@@ -268,11 +282,11 @@ void editorDrawRows(struct aBuf *ab) {
                 abAppend(ab, "~", 1);   //Append line tildes
             }
         } else {
-            int len = E.row[y].size;
+            int len = E.row[fileRow].size;
             if (len > E.screenCols)
                 len = E.screenCols;
             
-            abAppend(ab, E.row[y].chars, len);
+            abAppend(ab, E.row[fileRow].chars, len);
         }
 
         abAppend(ab, "\x1b[K", 3);  // Escaape K sequence at end of each line
@@ -285,6 +299,8 @@ void editorDrawRows(struct aBuf *ab) {
 
 
 void editorRefreshScreen() {
+    editorScroll();
+
     struct aBuf ab = ABUF_INIT;
 
     abAppend(&ab, "\x1b[?25l", 6);  // Show Mouse Cursor
@@ -293,7 +309,7 @@ void editorRefreshScreen() {
     editorDrawRows(&ab);
 
     char buf[32];
-    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);  // Add 1 to convert from 0 based C to 1 based terminal
+    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowOff) + 1, E.cx + 1);  // Add 1 to convert from 0 based C to 1 based terminal
     abAppend(&ab, buf, strlen(buf));
 
     abAppend(&ab, "\x1b[?25h", 6);  // Hide Mouse Cursor
@@ -323,7 +339,7 @@ void editorMoveCursor(int key) {
                 E.cy--;
             break;
         case ARROW_DOWN:
-            if (E.cy != E.screenRows - 1)
+            if (E.cy < E.numrows)
                 E.cy++;
             break;
     }
@@ -378,6 +394,7 @@ void initEditor() {
     E.cx = 0;
     E.cy = 0;
 
+    E.rowOff = 0;   // Default scroll to top
     E.numrows = 0;
     E.row = NULL;
 
