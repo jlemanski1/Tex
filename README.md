@@ -3,7 +3,7 @@
 ADD TRAVIS BUILD STATUS
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/jlemanski1/Tex.svg?style=for-the-badge)
 ![GitHub issues](https://img.shields.io/github/issues/jlemanski1/Tex.svg?style=for-the-badge)
-![GitHub](https://img.shields.io/github/license/jlemanski1/Tex.svg?color=Green&style=for-the-badge)
+![GitHub](https://img.shields.io/github/license/jlemanski1/Tex.svg?style=for-the-badge)
 ![GitHub last commit](https://img.shields.io/github/last-commit/jlemanski1/Tex.svg?style=for-the-badge)
 
 Tex is a minimalist text editor for bash terminals, written in c, with no dependencies. The reason for this project
