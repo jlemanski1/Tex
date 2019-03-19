@@ -25,7 +25,7 @@ make all
 ## Usage
   ### User Controls
   Key |  Usage
-  ----|-------
+  :----:|:-------:
   **NAVIGATION** |**-------------------------------------------**
   `ARROW_UP`   | Move cursor up
   `ARROW_DOWN` | Move curosr down
