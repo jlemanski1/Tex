@@ -530,6 +530,10 @@ void editorProcessKeyPress() {
 
     switch (c)
     {
+        case '\r':
+            // TODO
+            break;
+
         // CTRL-Q sucessful exit
         case CTRL_KEY('q'):
             // Clear screen
@@ -544,6 +548,12 @@ void editorProcessKeyPress() {
         case END_KEY:
             if (E.cy < E.numrows)
                 E.cx = E.row[E.cy].size;
+            break;
+        
+        case BACKSPACE:
+        case CTRL_KEY('h'):
+        case DEL_KEY:
+            // TODO
             break;
 
         case PAGE_UP:   // Move cursor to top edge
@@ -571,6 +581,10 @@ void editorProcessKeyPress() {
         case ARROW_LEFT:
         case ARROW_RIGHT:
             editorMoveCursor(c);
+            break;
+
+        case CTRL_KEY('l'):
+        case '\x1b':
             break;
         
         // Allow any unmapped keypress to be inserted directly into the text being edited. 

@@ -36,6 +36,7 @@
 
 // Arrow Key constants
 enum editorKey {
+    BACKSPACE = 127,
     ARROW_LEFT = 1000,  //out of range of a char so arrows don't conflict with ordinary keys
     ARROW_RIGHT,
     ARROW_UP,
