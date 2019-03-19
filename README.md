@@ -1,6 +1,6 @@
 # Tex
 
-ADD TRAVIS BUILD STATUS
+![Travis (.com)](https://img.shields.io/travis/com/jlemanski1/Tex.svg?style=for-the-badge)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/jlemanski1/Tex.svg?style=for-the-badge)
 ![GitHub issues](https://img.shields.io/github/issues/jlemanski1/Tex.svg?style=for-the-badge)
 ![GitHub](https://img.shields.io/github/license/jlemanski1/Tex.svg?style=for-the-badge)
