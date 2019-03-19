@@ -337,10 +337,24 @@ void editorSave() {
 
     // Open/Create new file if it doesn't exist, for read&write, and with proper permissions
     int fp = open(E.filename, O_RDWR | O_CREAT, 0644);
-    ftruncate(fp, len);     // Truncate file size to specified length
-    write(fp, buf, len);
-    close(fp);
+
+    // Error Handling
+    if (fp != -1) {
+        if (ftruncate(fp, len) != -1){
+            if (write(fp, buf, len) == len) {
+                // Successful save
+                close(fp);
+                free(buf);
+                // Notify user on sucessful save
+                editorSetStatusMessage("%d bytes written to disk", len);
+                return;
+            }
+        }
+        close(fp);
+    }
+    // Unsuccessful save
     free(buf);
+    editorSetStatusMessage("Can't save! I/O error: %s", strerror(errno));
 }
 
 
@@ -678,7 +692,8 @@ int main(int argc, char *argv[]) {
         editorOpen(argv[1]);
     }
 
-    editorSetStatusMessage("HELP: Ctrl-Q 'quit'");  // Set initial status message
+    // Set initial status message
+    editorSetStatusMessage("HELP: CTRL-S 'save' | Ctrl-Q 'quit'");
 
     while (1) {
         editorRefreshScreen();
