@@ -26,16 +26,18 @@ make all
   ### User Controls
   Key |  Usage
   ----|-------
-  ARROW_UP   | Move cursor up
-  ARROW_DOWN | Move curosr down
-  ARROR_RIGHT| Move cursor right
-  ARROW_LEFT | Move cursoor left
-  PAGE_UP    | Jump to BOF
-  PAGE_DOWN  | Jump to EOF
-  HOME       | Jump cursor to start of line
-  END        | Jump cursor to end of line
-  CTRL-S     | Save the file on disk
-  CTRL-Q     | Quit the editor
+  **NAVIGATION** |**-------------------------------------------**
+  `ARROW_UP`   | Move cursor up
+  `ARROW_DOWN` | Move curosr down
+  `ARROR_RIGHT`| Move cursor right
+  `ARROW_LEFT` | Move cursoor left
+  `PAGE_UP`    | Jump to BOF
+  `PAGE_DOWN`  | Jump to EOF
+  `HOME`       | Jump cursor to start of line
+  `END`        | Jump cursor to end of line
+  **EDITOR CONTROLS** |**-------------------------------------------**
+  `CTRL-S`     | Save the file on disk
+  `CTRL-Q`     | Quit the editor
 
   ```bash
   ./Tex            # Open Tex to new file
