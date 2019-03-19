@@ -3,6 +3,7 @@
 Tex is a minimalist text editor for bash terminals, written in c, with no dependencies. The reason for this project
 is to have a fun way to implement all the knowledge I've recently learned in school. Since my school projects have 
 been less exciting, a 64Kb Memory allocator for a recent example. Has no relation to the typesetting system, TeX.
+- - - 
 
 ## Installation
 TBA
@@ -19,6 +20,7 @@ make tex
 make all
 ...
 ```
+- - -
 
 ## Usage
   ### User Controls
@@ -41,9 +43,12 @@ make all
   ./Tex test_1.txt # TODO: Create file if not found in current directory
   ...
   ```
+  - - -
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+- - -
 
 ## License
 [GPL v3.0](https://choosealicense.com/licenses/gpl-3.0/)
+- - -
