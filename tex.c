@@ -261,6 +261,20 @@ void editorRowInsertChar(erow *row, int at, int c) {
 }
 
 
+void editorRowDelChar(erow *row, int at) {
+    // Return if undeletable
+    if (at < 0 || at >= row->size)
+        return;
+
+    // Overwrite the char to delete with the chars that come after it
+    memmove(&row->chars[at], &row->chars[at + 1], row->size - at);
+
+    row->size--;    // Decrement size after removing char
+    editorUpdateRow(row);   // Update row
+    E.dirty++;  // Mark as modified
+}
+
+
 /*--------------------------------------------------------------------------
                             EDITOR OPERATIONS
 --------------------------------------------------------------------------*/
@@ -274,6 +288,18 @@ void editorInsertChar(int c) {
     E.cx++; // Increment cursor after inserted char
 }
 
+void editorDelChar() {
+    // Return if cursor is past EOF
+    if (E.cy == E.numrows)
+        return;
+    
+    erow *row = &E.row[E.cy];
+
+    if (E.cx > 0) {
+        editorRowDelChar(row, E.cx - 1);
+        E.cx--;
+    }
+}
 
 
 /*--------------------------------------------------------------------------
@@ -625,10 +651,13 @@ void editorProcessKeyPress() {
                 E.cx = E.row[E.cy].size;
             break;
         
-        case BACKSPACE:
-        case CTRL_KEY('h'):
+        case BACKSPACE:         // Delete char to the left of the cursor
+        case CTRL_KEY('h'):     // Delete char to the left of the cursor
         case DEL_KEY:
-            // TODO
+            // Delete the character to the right of the cursor
+            if (c == DEL_KEY)
+                editorMoveCursor(ARROW_RIGHT);
+            editorDelChar();
             break;
 
         case PAGE_UP:   // Move cursor to top edge

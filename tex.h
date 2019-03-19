@@ -160,6 +160,11 @@ void editorAppendRow(char *s, size_t len);
 */
 void editorRowInsertChar(erow *row, int at, int c);
 
+/*
+    Deletes a char in an erow
+*/
+void editorRowDelChar(erow *row, int at);
+
 
 /*--------------------------------------------------------------------------
                             EDITOR OPERATIONS
@@ -170,6 +175,11 @@ void editorRowInsertChar(erow *row, int at, int c);
     cursor's position.
 */
 void editorInsertChar(int c);
+
+/*
+    Uses editorRowDelChar() to delete the character to the left of the cursor
+*/
+void editorDelChar();
 
 
 /*--------------------------------------------------------------------------
@@ -216,6 +226,7 @@ void abAppend(struct aBuf *ab, const char *s, int len);
     Free the append buffer
 */
 void abFree(struct aBuf *ab);
+
 
 /*--------------------------------------------------------------------------
                                    OUTPUT
