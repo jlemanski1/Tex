@@ -13,12 +13,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdarg.h>
-
-/*
-    *NOTE*:
-        - Because of disabled output processing, when printf-ing a new line, carriage return first
-        "\r\n"
-*/
+#include <fcntl.h>
 
 
 /*--------------------------------------------------------------------------
@@ -168,9 +163,20 @@ void editorInsertChar(int c);
 --------------------------------------------------------------------------*/
 
 /*
+    Converts array of erow structs into a single string ready to be written to a file.
+    Returns: buf - char *buf - Caller expected to free
+*/
+char *editorRowsToString(int *buflen);
+
+/*
     Opens and reads a file from disk
 */
 void editorOpen(char *filename);
+
+/*
+    Writes the string returned by editorRowsToString() to disk
+*/
+void editorSave();
 
 
 /*--------------------------------------------------------------------------

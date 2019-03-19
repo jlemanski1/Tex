@@ -278,6 +278,31 @@ void editorInsertChar(int c) {
                                  FILE IO
 --------------------------------------------------------------------------*/
 
+char *editorRowsToString(int *buflen) {
+    int totlen = 0;
+    int j;
+
+    // Get total length, from lengths of each row of text
+    for (j = 0; j < E.numrows; j++)
+        totlen += E.row[j].size + 1;
+    
+    *buflen = totlen;   // Save total length into buflen
+
+    char *buf = malloc(totlen); // Allocate memory for the string
+    char *p = buf;
+
+    for (j = 0; j < E.numrows; j++) {
+        // Copy contents of each row to the end of the buffer
+        memcpy(p, E.row[j].chars, E.row[j].size);
+        p += E.row[j].size; // Move pointer to end of line
+        *p = '\n';  // Append newline after each row
+        p++;        // Increment pointer
+    }
+
+    return buf;
+}
+
+
 void editorOpen(char *filename) {
     free(E.filename);   // Free prev filename
     E.filename = strdup(filename);  // Duplicate filename, returns identical malloc-ed string
@@ -299,6 +324,23 @@ void editorOpen(char *filename) {
     }
     free(line);
     fclose(fp);
+}
+
+
+void editorSave() {
+    // New file, don't know where to save so just return
+    if (E.filename == NULL)
+        return;
+    
+    int len;
+    char *buf = editorRowsToString(&len);
+
+    // Open/Create new file if it doesn't exist, for read&write, and with proper permissions
+    int fp = open(E.filename, O_RDWR | O_CREAT, 0644);
+    ftruncate(fp, len);     // Truncate file size to specified length
+    write(fp, buf, len);
+    close(fp);
+    free(buf);
 }
 
 
@@ -540,6 +582,11 @@ void editorProcessKeyPress() {
             write(STDOUT_FILENO, "\x1b[2J", 4);
             write(STDOUT_FILENO, "\x1b[H", 3);
             exit(EXIT_SUCCESS);
+            break;
+
+        // CTRL-S Save editor
+        case CTRL_KEY('s'):
+            editorSave();
             break;
 
         case HOME_KEY:
