@@ -29,7 +29,7 @@
 #define CTRL_KEY(k) ((k) &0x1f)
 
 // Version number
-#define TEX_VERSION "0.05"
+#define TEX_VERSION "0.06"
 
 // Tab Stop Constant
 #define TEX_TAB_STOP 8
@@ -144,6 +144,23 @@ void editorUpdateRow(erow *row);
 
 */
 void editorAppendRow(char *s, size_t len);
+
+/*
+    Inserts a single character into an erow, at a given position
+*/
+void editorRowInsertChar(erow *row, int at, int c);
+
+
+/*--------------------------------------------------------------------------
+                            EDITOR OPERATIONS
+--------------------------------------------------------------------------*/
+
+/*
+    Takes a character and uses editorRowInsertChar() to insert that character into the
+    cursor's position.
+*/
+void editorInsertChar(int c);
+
 
 /*--------------------------------------------------------------------------
                                  FILE IO

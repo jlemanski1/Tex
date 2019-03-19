@@ -231,15 +231,47 @@ void editorAppendRow(char *s, size_t len) {
     if (E.row[0].chars == NULL)
         die("E.row.chars malloc failed");
 
+    // Copy string into row's char array
     memcpy(E.row[at].chars, s, len);
-    E.row[at].chars[len] = '\0';
+    E.row[at].chars[len] = '\0';    // Add NULL terminator
 
+    // Reset rSize & render
     E.row[at].rSize = 0;
     E.row[at].render = NULL;
-    editorUpdateRow(&E.row[at]);
+    editorUpdateRow(&E.row[at]);    // Update render & rSize fields with the new row content
 
     E.numrows++;
 }
+
+
+void editorRowInsertChar(erow *row, int at, int c) {
+    // Validate at before assignment
+    if (at < 0 || at > row->size)
+        at = row->size;
+    
+    // Allocate extra byte for char and NULL byte
+    row->chars = realloc(row->chars, row->size + 2);
+    // Make room for new char
+    memmove(&row->chars[at + 1], &row->chars[at], row->size - at + 1);
+    row->size++;        // Increment size
+    row->chars[at] = c; // Assign char to position in the array
+    editorUpdateRow(row);   // Update render & rSize fields with the new row content
+}
+
+
+/*--------------------------------------------------------------------------
+                            EDITOR OPERATIONS
+--------------------------------------------------------------------------*/
+
+void editorInsertChar(int c) {
+    // Cursor is on the tilde line after EOF
+    if (E.cy == E.numrows)
+        editorAppendRow("", 0); // Append new row to file before inserting char
+    
+    editorRowInsertChar(&E.row[E.cy], E.cx, c);
+    E.cx++; // Increment cursor after inserted char
+}
+
 
 
 /*--------------------------------------------------------------------------
@@ -533,11 +565,17 @@ void editorProcessKeyPress() {
             }
             break;
 
+        // Arrow navigation
         case ARROW_UP:
         case ARROW_DOWN:
         case ARROW_LEFT:
         case ARROW_RIGHT:
             editorMoveCursor(c);
+            break;
+        
+        // Allow any unmapped keypress to be inserted directly into the text being edited. 
+        default:
+            editorInsertChar(c);
             break;
     }
 }
