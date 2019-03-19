@@ -5,10 +5,18 @@ is to have a fun way to implement all the knowledge I've recently learned in sch
 been less exciting, a 64Kb Memory allocator for a recent example. Has no relation to the typesetting system, TeX.
 
 ## Installation
-
 TBA
 
 ```bash
+# clone fron git into current directory
+git clone https://github.com/jlemanski1/Tex.git
+
+# separate compilation
+make tex.o
+make tex
+
+# all compilation
+make all
 ...
 ```
 
@@ -24,11 +32,13 @@ TBA
   PAGE_DOWN  | Jump to EOF
   HOME       | Jump cursor to start of line
   END        | Jump cursor to end of line
-  CTRL_Q     | Quit the editor
+  CTRL-S     | Save the file on disk
+  CTRL-Q     | Quit the editor
 
   ```bash
   ./Tex            # Open Tex to new file
   ./Tex test.txt   # Open file test.txt in Tex
+  ./Tex test_1.txt # TODO: Create file if not found in current directory
   ...
   ```
 
