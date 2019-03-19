@@ -156,9 +156,26 @@ void editorUpdateRow(erow *row);
 void editorAppendRow(char *s, size_t len);
 
 /*
+    Frees an erow, used when deleting an erow
+*/
+void editorFreeRow(erow *row);
+
+/*
+    Deletes an erow
+*/
+void editorDelRow(int at);
+
+
+/*
     Inserts a single character into an erow, at a given position
 */
 void editorRowInsertChar(erow *row, int at, int c);
+
+/*
+    Appends a string to the end of a row, used primarily the user backspaces at the
+    start of a line, appending the row to the previous one.
+*/
+void editorRowAppendString(erow *row, char *s, size_t len);
 
 /*
     Deletes a char in an erow

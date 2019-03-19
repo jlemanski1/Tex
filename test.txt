@@ -1,4 +1,4 @@
-TEST FILE Changing File to test mofidifiedasdlasfm 
+FILE Changing File to test various functions of the text editor
 TEST FILE FILE TEST
 TEST FILE
 TEST FILE

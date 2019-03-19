@@ -49,6 +49,10 @@ make all
   `PAGE_DOWN`  | Jump to EOF
   `HOME`       | Jump cursor to start of line
   `END`        | Jump cursor to end of line
+  **TEXT MANIPULATION** |**-------------------------------------------**
+  `DEL`        | Delete character right of curor
+  `BACKSPACE`  | Delete character left of cursor
+  `CTRL-H`     | Delete character left of cursor
   **EDITOR CONTROLS** |**-------------------------------------------**
   `CTRL-S`     | Save the file on disk
   `CTRL-Q`     | Quit the editor

@@ -245,6 +245,24 @@ void editorAppendRow(char *s, size_t len) {
 }
 
 
+void editorFreeRow(erow *row) {
+    free(row->render);
+    free(row->chars);
+}
+
+void editorDelRow(int at) {
+    // Return if row is undeletable (after EOF)
+    if (at < 0 || at >= E.numrows)
+        return;
+
+    editorFreeRow(&E.row[at]);  // Free memory used by the row
+    // Overwrite the deleted row struct with the rest of the rows that come after it
+    memmove(&E.row[at], &E.row[at + 1], sizeof(erow) * (E.numrows - at - 1));
+    E.numrows--;    // Decrement numrows after deletion
+    E.dirty++;      // Mark as modified
+} 
+
+
 void editorRowInsertChar(erow *row, int at, int c) {
     // Validate at before assignment
     if (at < 0 || at > row->size)
@@ -258,6 +276,18 @@ void editorRowInsertChar(erow *row, int at, int c) {
     row->chars[at] = c; // Assign char to position in the array
     editorUpdateRow(row);   // Update render & rSize fields with the new row content
     E.dirty++;  // Increment dirty after changing text
+}
+
+
+void editorRowAppendString(erow *row, char *s, size_t len) {
+    // Realloc enough memory for the new string
+    row->chars = realloc(row->chars, row->size + len + 1);
+    // memcpy the string to the end of the contents of row->chars
+    memcpy(&row->chars[row->size], s, len);
+    row->size += len;   // Increment size with length of new string
+    row->chars[row->size] = '\0';   // Add Null terminator to end
+    editorUpdateRow(row);   // Update row
+    E.dirty++;  // Mark as modified
 }
 
 
@@ -292,12 +322,26 @@ void editorDelChar() {
     // Return if cursor is past EOF
     if (E.cy == E.numrows)
         return;
+        
+    // If cursor is at top left corner, there's nothing to delete, return
+    if (E.cx == 0 && E.cy == 0)
+        return;
     
     erow *row = &E.row[E.cy];
 
     if (E.cx > 0) {
         editorRowDelChar(row, E.cx - 1);
         E.cx--;
+    } else {
+        /*
+            Set cx to the end of the contents of the previous row so the cursor ends
+            up where the two lines joined up
+        */
+        E.cx = E.row[E.cy - 1].size;
+        // Append the current row to the previous row
+        editorRowAppendString(&E.row[E.cy - 1], row->chars, row->size);
+        editorDelRow(E.cy); // Delete the row being pointed to
+        E.cy--;
     }
 }
 
