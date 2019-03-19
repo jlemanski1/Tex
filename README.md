@@ -1,10 +1,10 @@
 # Tex
 
-![Travis (.com)](https://img.shields.io/travis/com/jlemanski1/Tex.svg?style=for-the-badge)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/jlemanski1/Tex.svg?style=for-the-badge)
-![GitHub issues](https://img.shields.io/github/issues/jlemanski1/Tex.svg?style=for-the-badge)
-![GitHub](https://img.shields.io/github/license/jlemanski1/Tex.svg?style=for-the-badge)
-![GitHub last commit](https://img.shields.io/github/last-commit/jlemanski1/Tex.svg?style=for-the-badge)
+![Travis (.com)](https://img.shields.io/travis/com/jlemanski1/Tex.svg?style=flat-square)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/jlemanski1/Tex.svg?style=flat-square)
+![GitHub issues](https://img.shields.io/github/issues/jlemanski1/Tex.svg?style=flat-square)
+![GitHub](https://img.shields.io/github/license/jlemanski1/Tex.svg?style=flat-square)
+![GitHub last commit](https://img.shields.io/github/last-commit/jlemanski1/Tex.svg?style=flat-square)
 
 Tex is a minimalist text editor for bash terminals, written in c, with no dependencies. The reason for this project
 is to have a fun way to implement all the knowledge I've recently learned in school. Since my school projects have 
@@ -56,6 +56,15 @@ make all
   `CTRL-S`     | Save the file on disk
   `CTRL-Q`     | Quit the editor
   - - -
+
+## Tasks:
+- [ ] Implement a search feature
+- [ ] Implement syntax highlighting
+- [ ] Language based syntax highlighting
+- [ ] Shift select words
+- [ ] Copy & Paste
+- [ ] Auto indent newlines to same level as previous one
+- - -
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
