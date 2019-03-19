@@ -2,7 +2,7 @@
 
 Tex is a minimalist text editor for bash terminals, written in c, with no dependencies. The reason for this project
 is to have a fun way to implement all the knowledge I've recently learned in school. Since my school projects have 
-been less excited, a 64Kb Memory allocator for a recent example.
+been less exciting, a 64Kb Memory allocator for a recent example. Has no relation to the typesetting system, TeX.
 
 ## Installation
 
@@ -28,7 +28,7 @@ TBA
 
   ```bash
   ./Tex            # Open Tex to new file
-  ./Tex Test.txt   # Open file Test.txt in Tex
+  ./Tex test.txt   # Open file test.txt in Tex
   ...
   ```
 
