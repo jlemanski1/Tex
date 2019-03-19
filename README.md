@@ -53,6 +53,7 @@ make all
   `DEL`        | Delete character right of curor
   `BACKSPACE`  | Delete character left of cursor
   `CTRL-H`     | Delete character left of cursor
+  `ENTER`      | Insert a new line
   **EDITOR CONTROLS** |**-------------------------------------------**
   `CTRL-S`     | Save the file on disk
   `CTRL-Q`     | Quit the editor

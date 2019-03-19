@@ -221,10 +221,16 @@ void editorUpdateRow(erow *row) {
 }
 
 
-void editorAppendRow(char *s, size_t len) {
-    E.row = realloc(E.row, sizeof(erow) * (E.numrows + 1)); // Reallocate space for new row
+void editorInsertRow(int at, char *s, size_t len) {
+    // Validate at before inserting row
+    if (at < 0 || at > E.numrows)
+        return;
 
-    int at = E.numrows;
+    // Reallocate space for new row
+    E.row = realloc(E.row, sizeof(erow) * (E.numrows + 1));
+    // Make room at the specified index for the new row
+    memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
+
     E.row[at].size = len;
     E.row[at].chars = malloc(len + 1);
 
@@ -312,11 +318,33 @@ void editorRowDelChar(erow *row, int at) {
 void editorInsertChar(int c) {
     // Cursor is on the tilde line after EOF
     if (E.cy == E.numrows)
-        editorAppendRow("", 0); // Append new row to file before inserting char
+        editorInsertRow(E.numrows, "", 0); // Append new row to file before inserting char
     
     editorRowInsertChar(&E.row[E.cy], E.cx, c);
     E.cx++; // Increment cursor after inserted char
 }
+
+
+void editorInsertNewLine(){
+    // If cursor is at begining of line, insert a new black row before that current line
+    if (E.cx == 0) {
+        editorInsertRow(E.cy, "", 0);
+    } else {
+        // Split the current line into two rows
+        erow *row = &E.row[E.cy];
+        // Create a new row after the current one, with the correct contents
+        editorInsertRow(E.cy + 1, &row->chars[E.cx], row->size - E.cx);
+
+        row = &E.row[E.cy]; // Reassign row ptr, since editorInsertRow() calls realloc()
+        row->size = E.cx;   // Truncate row, set size to cursor pos
+        row->chars[row->size] = '\0';   // Add NULL terminator
+        editorUpdateRow(row);   // Update the new row
+    }
+    // Move cursor to the start of the new line
+    E.cy++;
+    E.cx = 0;
+}
+
 
 void editorDelChar() {
     // Return if cursor is past EOF
@@ -392,7 +420,7 @@ void editorOpen(char *filename) {
         while (linelen > 0 && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r'))
             linelen--;
         
-        editorAppendRow(line, linelen);   
+        editorInsertRow(E.numrows, line, linelen);   
     }
     free(line);
     fclose(fp);
@@ -662,8 +690,9 @@ void editorProcessKeyPress() {
 
     switch (c)
     {
+        // ENTER key is pressed, insert newline
         case '\r':
-            // TODO
+            editorInsertNewLine();
             break;
 
         // CTRL-Q sucessful exit

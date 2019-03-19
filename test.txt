@@ -1,5 +1,15 @@
 FILE Changing File to test various functions of the text editor
 TEST FILE FILE TEST
+
+Testing the newline function here
+	It
+		Works
+			Nicely
+		Doesn't
+	It?
+
+^^ Reading that on the other hand, does not...
+
 TEST FILE
 TEST FILE
 TEST FILE

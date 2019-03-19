@@ -153,7 +153,7 @@ void editorUpdateRow(erow *row);
 /*
 
 */
-void editorAppendRow(char *s, size_t len);
+void editorInsertRow(int at, char *s, size_t len);
 
 /*
     Frees an erow, used when deleting an erow
@@ -192,6 +192,11 @@ void editorRowDelChar(erow *row, int at);
     cursor's position.
 */
 void editorInsertChar(int c);
+
+/*
+    Handles Enter keypresses by inserting a new line
+*/
+void editorInsertNewLine();
 
 /*
     Uses editorRowDelChar() to delete the character to the left of the cursor
