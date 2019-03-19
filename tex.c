@@ -241,6 +241,7 @@ void editorAppendRow(char *s, size_t len) {
     editorUpdateRow(&E.row[at]);    // Update render & rSize fields with the new row content
 
     E.numrows++;
+    E.dirty++;  // Increment dirty after changing text
 }
 
 
@@ -256,6 +257,7 @@ void editorRowInsertChar(erow *row, int at, int c) {
     row->size++;        // Increment size
     row->chars[at] = c; // Assign char to position in the array
     editorUpdateRow(row);   // Update render & rSize fields with the new row content
+    E.dirty++;  // Increment dirty after changing text
 }
 
 
@@ -324,6 +326,7 @@ void editorOpen(char *filename) {
     }
     free(line);
     fclose(fp);
+    E.dirty = 0;    // Reset flag so user isn't alerted after opening file
 }
 
 
@@ -345,6 +348,7 @@ void editorSave() {
                 // Successful save
                 close(fp);
                 free(buf);
+                E.dirty = 0;    // Reset flag after saving
                 // Notify user on sucessful save
                 editorSetStatusMessage("%d bytes written to disk", len);
                 return;
@@ -462,8 +466,9 @@ void editorDrawStatusBar(struct aBuf *ab) {
     abAppend(ab, "\x1b[7m", 4);     // Invert status bar colours [7m
     char status[80], rStatus[80];
     // Cut string short if it doesn't fit, display [No Name] if there's no filename
-    int len = snprintf(status, sizeof(status), "%.20s - %d lines",
-        E.filename ? E.filename: "[No Name]", E.numrows);
+    int len = snprintf(status, sizeof(status), "%.20s - %d lines %s",
+        E.filename ? E.filename: "[No Name]", E.numrows,
+        E.dirty ? "(modified)" : "");   // Alert user when file is modified since last save
     
     int rLen = snprintf(rStatus, sizeof(rStatus), "%d/%d", E.cy + 1, E.numrows);
 
@@ -672,6 +677,7 @@ void initEditor() {
 
     E.numrows = 0;
     E.row = NULL;
+    E.dirty = 0;
 
     // Initialize Status bar
     E.filename = NULL;

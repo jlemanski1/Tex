@@ -69,6 +69,7 @@ struct editorConfig {
     // Editor Rows
     int numrows;
     erow *row;
+    int dirty;   // modified since opening flag
     // Status Bar
     char *filename; // Filename, for status bar
     char statusmsg[80];
