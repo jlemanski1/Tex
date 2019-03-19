@@ -23,6 +23,14 @@ make all
 - - -
 
 ## Usage
+
+  ```bash
+  ./Tex            # Open Tex to new file
+  ./Tex test.txt   # Open file test.txt in Tex
+  ./Tex test_1.txt # TODO: Create file if not found in current directory
+  ...
+  ```
+  
   ### User Controls
   Key |  Usage
   :----:|:-------:
@@ -38,13 +46,6 @@ make all
   **EDITOR CONTROLS** |**-------------------------------------------**
   `CTRL-S`     | Save the file on disk
   `CTRL-Q`     | Quit the editor
-
-  ```bash
-  ./Tex            # Open Tex to new file
-  ./Tex test.txt   # Open file test.txt in Tex
-  ./Tex test_1.txt # TODO: Create file if not found in current directory
-  ...
-  ```
   - - -
 
 ## Contributing
