@@ -29,6 +29,9 @@
 // Tab Stop Constant
 #define TEX_TAB_STOP 8
 
+// Quit confirmation, Force user to press CTRL-Q 3 times to quit with unsaved changes
+#define TEX_QUIT_AMOUNT 3
+
 // Arrow Key constants
 enum editorKey {
     BACKSPACE = 127,

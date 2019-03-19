@@ -587,6 +587,7 @@ void editorMoveCursor(int key) {
 
 
 void editorProcessKeyPress() {
+    static int quitCount = TEX_QUIT_AMOUNT;    // Track amount of quit keypresses
     int c = editorReadKey();
 
     switch (c)
@@ -597,6 +598,14 @@ void editorProcessKeyPress() {
 
         // CTRL-Q sucessful exit
         case CTRL_KEY('q'):
+            // Require confimation to exit with unsaved changes
+            if (E.dirty && quitCount > 0) {
+                // Warn User
+                editorSetStatusMessage("WARNING! %s has unsaved changes."
+                    "Press Ctrl-Q %d more times to quit.", E.filename, quitCount);
+                quitCount--;
+                return;
+            }
             // Clear screen
             write(STDOUT_FILENO, "\x1b[2J", 4);
             write(STDOUT_FILENO, "\x1b[H", 3);
@@ -658,6 +667,7 @@ void editorProcessKeyPress() {
             editorInsertChar(c);
             break;
     }
+    quitCount = TEX_QUIT_AMOUNT;   // Rest quit counter
 }
 
 
