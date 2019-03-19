@@ -12,8 +12,7 @@ been less exciting, a 64Kb Memory allocator for a recent example. Has no relatio
 - - - 
 
 ## Installation
-TBA
-
+To be Expanded...
 ```bash
 # clone fron git into current directory
 git clone https://github.com/jlemanski1/Tex.git
@@ -31,9 +30,8 @@ make all
 ## Usage
 
   ```bash
-  ./Tex            # Open Tex to new file
-  ./Tex test.txt   # Open file test.txt in Tex
-  ./Tex test_1.txt # TODO: Create file if not found in current directory
+  ./tex            # Create a new file with Tex
+  ./tex test.txt   # Open file test.txt in Tex\
   ...
   ```
   
