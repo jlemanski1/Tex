@@ -31,7 +31,7 @@ make all
 
   ```bash
   ./tex            # Create a new file with Tex
-  ./tex test.txt   # Open file test.txt in Tex\
+  ./tex test.txt   # Open file test.txt in Tex
   ...
   ```
   
@@ -43,8 +43,8 @@ make all
   `ARROW_DOWN` | Move curosr down
   `ARROR_RIGHT`| Move cursor right
   `ARROW_LEFT` | Move cursoor left
-  `PAGE_UP`    | Jump to BOF
-  `PAGE_DOWN`  | Jump to EOF
+  `PAGE_UP`    | Jump cursor to BOF
+  `PAGE_DOWN`  | Jump cursor to EOF
   `HOME`       | Jump cursor to start of line
   `END`        | Jump cursor to end of line
   **TEXT MANIPULATION** |**-------------------------------------------**
