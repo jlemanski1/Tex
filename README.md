@@ -6,8 +6,8 @@
 ![GitHub](https://img.shields.io/github/license/jlemanski1/Tex.svg?style=flat-square)
 ![GitHub last commit](https://img.shields.io/github/last-commit/jlemanski1/Tex.svg?style=flat-square)
 
-Tex is a minimalist text editor for bash terminals, written in c, with no dependencies. The reason for this project
-is to have a fun way to implement all the knowledge I've recently learned in school. Since my school projects have 
+Tex is a minimalist text editor for bash terminals, written in c, with 0 dependencies. The reason for starting this project
+was to have a fun way to implement all the knowledge I've recently learned in school. Especially since my school projects have 
 been less exciting, a 64Kb Memory allocator for a recent example. Has no relation to the typesetting system, TeX.
 - - - 
 
