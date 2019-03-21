@@ -24,7 +24,7 @@
 #define CTRL_KEY(k) ((k) &0x1f)
 
 // Version number
-#define TEX_VERSION "0.06"
+#define TEX_VERSION "0.1.0"
 
 // Tab Stop Constant
 #define TEX_TAB_STOP 8
@@ -93,7 +93,6 @@ struct editorConfig E;
 */
 void editorSetStatusMessage(const char *fmt, ...);
 
-
 /*--------------------------------------------------------------------------
                                   TERMINAL
 --------------------------------------------------------------------------*/
@@ -145,20 +144,24 @@ int getWindowSize(int *rows, int *cols);
 */
 int editorRowCxToRx(erow *row, int cx);
 
+
 /*
     Uses the chars string of an erow to fill in the contents of the render string
 */
 void editorUpdateRow(erow *row);
+
 
 /*
 
 */
 void editorInsertRow(int at, char *s, size_t len);
 
+
 /*
     Frees an erow, used when deleting an erow
 */
 void editorFreeRow(erow *row);
+
 
 /*
     Deletes an erow
@@ -171,11 +174,13 @@ void editorDelRow(int at);
 */
 void editorRowInsertChar(erow *row, int at, int c);
 
+
 /*
     Appends a string to the end of a row, used primarily the user backspaces at the
     start of a line, appending the row to the previous one.
 */
 void editorRowAppendString(erow *row, char *s, size_t len);
+
 
 /*
     Deletes a char in an erow
@@ -193,16 +198,17 @@ void editorRowDelChar(erow *row, int at);
 */
 void editorInsertChar(int c);
 
+
 /*
     Handles Enter keypresses by inserting a new line
 */
 void editorInsertNewLine();
 
+
 /*
     Uses editorRowDelChar() to delete the character to the left of the cursor
 */
 void editorDelChar();
-
 
 /*--------------------------------------------------------------------------
                                  FILE IO
@@ -214,16 +220,17 @@ void editorDelChar();
 */
 char *editorRowsToString(int *buflen);
 
+
 /*
     Opens and reads a file from disk
 */
 void editorOpen(char *filename);
 
+
 /*
     Writes the string returned by editorRowsToString() to disk
 */
 void editorSave();
-
 
 /*--------------------------------------------------------------------------
                                APPEND BUFFER
@@ -237,18 +244,20 @@ struct aBuf {
     int len;
 };
 
+
 #define ABUF_INIT {NULL, 0} // Empty buffer
+
 
 /*
     Append a string to the append buffer
 */
 void abAppend(struct aBuf *ab, const char *s, int len);
 
+
 /*
     Free the append buffer
 */
 void abFree(struct aBuf *ab);
-
 
 /*--------------------------------------------------------------------------
                                    OUTPUT
@@ -260,11 +269,13 @@ void abFree(struct aBuf *ab);
 */
 void editorScroll();
 
+
 /*
     Handles drawing each row of the buffer of text being edited.
     Current fraw a tilde ~ in each row, that row is not part of the file and can't contain text
 */
 void editorDrawRows(struct aBuf *ab);
+
 
 /*
     Draws the status bar to show useful info like the filename, the line count, the current
@@ -272,16 +283,19 @@ void editorDrawRows(struct aBuf *ab);
 */
 void editorDrawStatusBar(struct aBuf *ab);
 
+
 /*
 
 */
 void editorRefreshScreen();
+
 
 /*
     Variadic function(takes any number of args), Prints a stauts message below the status
     bar notifying users of saves, erros, etc.
 */
 void editorSetStatusMessage(const char *fmt, ...);
+
 
 /*
     Updates the status bar message
@@ -292,6 +306,12 @@ void editorDrawMessageBar(struct aBuf *ab);
 /*--------------------------------------------------------------------------
                                    INPUT
 --------------------------------------------------------------------------*/
+
+/*
+    Displays a prompt in the status bar, and returns the user input a line of text after the prompt
+*/
+char *editorPrompt(char *prompt);
+
 
 /*
     Allows the user move the curor using WASD keys

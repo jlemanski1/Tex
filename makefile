@@ -9,3 +9,6 @@ tex.o: tex.c tex.h
 
 tex: tex.o
 	$(CC) $(CFLAGS) -o tex tex.o
+
+tar: all
+	tar -zcvf Tex.tar.gz *.c *h *.md makefile

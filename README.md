@@ -58,7 +58,7 @@ make all
   - - -
 
 ## Tasks:
-- [ ] Implement a search feature
+- [x] Implement a search feature
 - [ ] Implement syntax highlighting
 - [ ] Language based syntax highlighting
 - [ ] Shift select words

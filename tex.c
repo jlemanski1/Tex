@@ -429,9 +429,15 @@ void editorOpen(char *filename) {
 
 
 void editorSave() {
-    // New file, don't know where to save so just return
-    if (E.filename == NULL)
-        return;
+    // New file, prompt user for a filename
+    if (E.filename == NULL) {
+        E.filename = editorPrompt("Save as %s (ESC to cancel)");
+        // User presses ESC, abort save
+        if (E.filename == NULL) {
+            editorSetStatusMessage("Save aborted!");
+            return;
+        }
+    }
     
     int len;
     char *buf = editorRowsToString(&len);
@@ -635,6 +641,49 @@ void editorRefreshScreen() {
 /*--------------------------------------------------------------------------
                                    INPUT
 --------------------------------------------------------------------------*/
+
+char *editorPrompt(char *prompt) {
+    size_t bufsize = 128;
+    char *buf = malloc(bufsize);    // Stores user input
+
+    size_t buflen = 0;
+    buf[0] = '\0';  // Initialize buf with a NULL terminator
+
+    // Repeatedly set the status message, refresh the screen, and wait for a keypress to handle
+    while (1) {
+        editorSetStatusMessage(prompt, buf);
+        editorRefreshScreen();
+
+        int c = editorReadKey();
+        // Allow removing chars in prompt input
+        if (c == DEL_KEY || c == CTRL_KEY('h') || c == BACKSPACE) {
+            if (buflen != 0)
+                buf[--buflen] = '\0';
+        } else if (c == '\x1b') {   // User presses Escape key, cancel input prompt
+            editorSetStatusMessage("");
+            free(buf);
+            return NULL;
+        }
+        // User presses Enter key
+        if (c == '\r') {
+            // Input is not empty
+            if (buflen != 0) {
+                // Clear status message and return the user's input
+                editorSetStatusMessage("");
+                return buf;
+            }
+        } else if(!iscntrl(c) && c < 128) {     // Ensure key isn't a special key defined in editorKey enum
+            // buflen has reached the maximum capacity
+            if (buflen == bufsize - 1) {
+                bufsize *= 2;   // double the bufsize
+                buf = realloc(buf, bufsize);    // realloc to account for new size
+            }
+            buf[buflen++] = c;  // Append char to buf
+            buf[buflen] = '\0'; // Add NULL terminator
+        }
+    }
+}
+
 
 void editorMoveCursor(int key) {
     erow *row = (E.cy >= E.numrows) ? NULL : &E.row[E.cy];
