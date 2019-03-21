@@ -72,12 +72,13 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ## Versioning
 This project uses the Semantic Versioning idealogy, a short summary can be found below, with more information found on the [website](https://semver.org/spec/v2.0.0.html)
-  ### Summary
+   ### Summary
    Given a version number MAJOR.MINOR.PATCH, increment the:
-     1. MARJOR version when you make incompatible API changes,
-     2. MINOR version when you add functionality in a backwards-compatible manner, and
-     3. PATCH version when you make backwards-compatible bug fixes.
-   Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
+1. MARJOR version when you make incompatible API changes,
+2. MINOR version when you add functionality in a backwards-compatible manner, and 
+3. PATCH version when you make backwards-compatible bug fixes.
+
+Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
 - - -
 
 ## License
