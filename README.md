@@ -17,11 +17,7 @@ To be Expanded...
 # clone fron git into current directory
 git clone https://github.com/jlemanski1/Tex.git
 
-# separate compilation
-make tex.o
-make tex
-
-# all compilation
+# Compile
 make all
 ...
 ```
