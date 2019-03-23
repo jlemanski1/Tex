@@ -24,7 +24,7 @@
 #define CTRL_KEY(k) ((k) &0x1f)
 
 // Version number
-#define TEX_VERSION "0.1.0"
+#define TEX_VERSION "0.3.0"
 
 // Tab Stop Constant
 #define TEX_TAB_STOP 8
@@ -146,6 +146,12 @@ int editorRowCxToRx(erow *row, int cx);
 
 
 /*
+    Coverts a render index to a char index, essentially does the opposite of editorRowCxToRx()
+*/
+int editorRowRxToCx(erow *row, int rx);
+
+
+/*
     Uses the chars string of an erow to fill in the contents of the render string
 */
 void editorUpdateRow(erow *row);
@@ -231,6 +237,13 @@ void editorOpen(char *filename);
     Writes the string returned by editorRowsToString() to disk
 */
 void editorSave();
+
+
+/*
+    When the user types a search query and presses Enter, loops through all the fows in the file,
+    and if a row contains their query string, the cursor is moved to the match
+*/
+void editorFind();
 
 /*--------------------------------------------------------------------------
                                APPEND BUFFER
