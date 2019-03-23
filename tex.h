@@ -24,7 +24,7 @@
 #define CTRL_KEY(k) ((k) &0x1f)
 
 // Version number
-#define TEX_VERSION "0.3.0"
+#define TEX_VERSION "0.3.7"
 
 // Tab Stop Constant
 #define TEX_TAB_STOP 8
@@ -83,15 +83,6 @@ struct editorConfig {
 
 struct editorConfig E;
 
-
-/*--------------------------------------------------------------------------
-                                  PROTOTYPES
---------------------------------------------------------------------------*/
-
-/*
-
-*/
-void editorSetStatusMessage(const char *fmt, ...);
 
 /*--------------------------------------------------------------------------
                                   TERMINAL
@@ -216,6 +207,9 @@ void editorInsertNewLine();
 */
 void editorDelChar();
 
+
+
+
 /*--------------------------------------------------------------------------
                                  FILE IO
 --------------------------------------------------------------------------*/
@@ -242,6 +236,12 @@ void editorSave();
 /*
     When the user types a search query and presses Enter, loops through all the fows in the file,
     and if a row contains their query string, the cursor is moved to the match
+*/
+void editorFindCallback(char *query, int key);
+
+
+/*
+    Get query from the user  from and then return the cursor to its previous position before the search
 */
 void editorFind();
 
@@ -323,7 +323,7 @@ void editorDrawMessageBar(struct aBuf *ab);
 /*
     Displays a prompt in the status bar, and returns the user input a line of text after the prompt
 */
-char *editorPrompt(char *prompt);
+char *editorPrompt(char *prompt, void (*callback)(char *, int));
 
 
 /*

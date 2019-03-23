@@ -448,7 +448,7 @@ void editorOpen(char *filename) {
 void editorSave() {
     // New file, prompt user for a filename
     if (E.filename == NULL) {
-        E.filename = editorPrompt("Save as %s (ESC to cancel)");
+        E.filename = editorPrompt("Save as %s (ESC to cancel)", NULL);
         // User presses ESC, abort save
         if (E.filename == NULL) {
             editorSetStatusMessage("Save aborted!");
@@ -483,31 +483,74 @@ void editorSave() {
 }
 
 
-void editorFind() {
-    // Query user for string to search for, returns NULL on ESC key press
-    char *query = editorPrompt("Search: %s (ESC to cancel)");
-    
-    // Exit if user enters ESC
-    if (query == NULL)
+void editorFindCallback(char *query, int key) {
+    static int lastMatch = -1;  // -1 when there is no last match
+    static int direction = 1;   // 1 Seach forward, -1 seach backward
+
+    // Exit and reset lastMatch & dir
+    if (key == '\r' || key == '\x1b') {
+        lastMatch = -1;
+        direction = 1;
         return;
+    } else if (key == ARROW_RIGHT || key == ARROW_DOWN) {   // Jump to next match found
+        direction = 1;
+    } else if (key == ARROW_LEFT || key == ARROW_UP) {      // Jump to prev match
+        direction = -1;
+    } else {
+        lastMatch = -1;
+        direction = 1;
+    }
+    
+    if (lastMatch == -1)
+        direction = 1;
+
+    int current = lastMatch;
 
     // Loop through rows in the file
     for (int i = 0; i < E.numrows; i++) {
-        erow *row = &E.row[i];
+        current += direction;
+
+        if (current == -1)
+            current = E.numrows - 1;
+        else if (current == E.numrows)
+            current = 0;
+        
+
+        erow *row = &E.row[current];
         // Check if query is found in file, return pointer to the matching substring
         char *match = strstr(row->render, query);
 
         // String is found in file
         if (match) {
-            E.cy = i;   // Move cursor to row
+            lastMatch = current;
+            E.cy = current; // Jump cursor to next match row
             // Move cursor to the substring on the row
             E.cx = editorRowRxToCx(row, match - row->render);
             E.rowOff = E.numrows;   // Update row offset
             break;
         }
     }
+}
 
-    free(query);    // Free the users query
+
+void editorFind() {
+    // Save cursor location prior to search
+    int save_cx = E.cx;
+    int saved_cy = E.cy;
+    int saved_colOff = E.colOff;
+    int saved_rowOff = E.rowOff;
+
+    // Query user for string to search for, returns NULL on ESC key press
+    char *query = editorPrompt("Search: %s (Use Arrow keys goto next match, and ESC to exit find mode)", editorFindCallback);
+
+    if (query) {
+        free(query);
+    } else {    // Restore cursor to previous position
+        E.cx = save_cx;
+        E.cy = saved_cy;
+        E.colOff = saved_colOff;
+        E.rowOff = saved_rowOff;
+    }
 }
 
 
@@ -687,7 +730,7 @@ void editorRefreshScreen() {
                                    INPUT
 --------------------------------------------------------------------------*/
 
-char *editorPrompt(char *prompt) {
+char *editorPrompt(char *prompt, void (*callback)(char *, int)) {
     size_t bufsize = 128;
     char *buf = malloc(bufsize);    // Stores user input
 
@@ -706,6 +749,8 @@ char *editorPrompt(char *prompt) {
                 buf[--buflen] = '\0';
         } else if (c == '\x1b') {   // User presses Escape key, cancel input prompt
             editorSetStatusMessage("");
+            if (callback)
+                callback(buf, c);
             free(buf);
             return NULL;
         }
@@ -715,6 +760,8 @@ char *editorPrompt(char *prompt) {
             if (buflen != 0) {
                 // Clear status message and return the user's input
                 editorSetStatusMessage("");
+                if (callback)
+                    callback(buf, c);
                 return buf;
             }
         } else if(!iscntrl(c) && c < 128) {     // Ensure key isn't a special key defined in editorKey enum
@@ -726,6 +773,8 @@ char *editorPrompt(char *prompt) {
             buf[buflen++] = c;  // Append char to buf
             buf[buflen] = '\0'; // Add NULL terminator
         }
+        if (callback)
+            callback(buf, c);
     }
 }
 
