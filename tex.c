@@ -475,6 +475,7 @@ void editorSave() {
                 return;
             }
         }
+        // Close file after succesfully saving
         close(fp);
     }
     // Unsuccessful save
@@ -487,7 +488,7 @@ void editorFindCallback(char *query, int key) {
     static int lastMatch = -1;  // -1 when there is no last match
     static int direction = 1;   // 1 Seach forward, -1 seach backward
 
-    // Exit and reset lastMatch & dir
+    // Exit and reset lastMatch & dir for next search
     if (key == '\r' || key == '\x1b') {
         lastMatch = -1;
         direction = 1;
