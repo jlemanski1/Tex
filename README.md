@@ -54,6 +54,7 @@ make all
   `ENTER`      | Insert a new line
   **EDITOR CONTROLS** |**-------------------------------------------**
   `CTRL-S`     | Save the file on disk
+  `CTRL-F`     | Find a string in the file
   `CTRL-Q`     | Quit the editor
   - - -
 
