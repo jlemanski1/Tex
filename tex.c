@@ -197,6 +197,9 @@ int editorSyntaxToColour(int highlight) {
     {
         case HL_NUMBER:
             return 31;
+
+        case HL_MATCH:
+            return 34;  // Blue
     
         default:
             return 37;
@@ -563,6 +566,8 @@ void editorFindCallback(char *query, int key) {
             // Move cursor to the substring on the row
             E.cx = editorRowRxToCx(row, match - row->render);
             E.rowOff = E.numrows;   // Update row offset
+            
+            memset(&row->highlight[match - row->render], HL_MATCH, strlen(query));
             break;
         }
     }

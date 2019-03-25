@@ -47,8 +47,9 @@ enum editorKey {
 };
 
 enum editorHighlight {
-    HL_NORMAL = 0,
-    HL_NUMBER
+    HL_NORMAL = 0,  // Hightlight keywords
+    HL_NUMBER,      // Highlight Numbers
+    HL_MATCH        // Highlights search results
 };
 
 /*--------------------------------------------------------------------------
