@@ -526,6 +526,16 @@ void editorFindCallback(char *query, int key) {
     static int lastMatch = -1;  // -1 when there is no last match
     static int direction = 1;   // 1 Seach forward, -1 seach backward
 
+    static int saved_hl_line;
+    static char *saved_hl = NULL;
+
+    // Save syntax highlights pripr to search
+    if (saved_hl) {
+        memcpy(E.row[saved_hl_line].highlight, saved_hl, E.row[saved_hl_line].rSize);
+        free(saved_hl); // Free incase user cancels search
+        saved_hl = NULL;
+    }
+
     // Exit and reset lastMatch & dir for next search
     if (key == '\r' || key == '\x1b') {
         lastMatch = -1;
@@ -567,6 +577,11 @@ void editorFindCallback(char *query, int key) {
             E.cx = editorRowRxToCx(row, match - row->render);
             E.rowOff = E.numrows;   // Update row offset
             
+            // Restore previous syntax highlighting
+            saved_hl_line = current;
+            saved_hl = malloc(row->rSize);
+            memcpy(saved_hl, row->highlight, row->rSize);
+
             memset(&row->highlight[match - row->render], HL_MATCH, strlen(query));
             break;
         }
