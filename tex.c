@@ -174,6 +174,36 @@ int getWindowSize(int *rows, int *cols) {
 
 
 /*--------------------------------------------------------------------------
+                          SYNTAX HIGHLIGHTING
+--------------------------------------------------------------------------*/
+
+void editorUpdateSyntax(erow *row) {
+    // Realloc for new row
+    row->highlight = realloc(row->highlight, row->rSize);
+    // Set all characters to HL_NORMAL by default
+    memset(row->highlight, HL_NORMAL, row->rSize);
+
+    // Loop through the characters and set digits to HL_NUMBER
+    for (int i = 0; i < row->rSize; i++) {
+        if (isdigit(row->render[i])) {
+            row->highlight[i] = HL_NUMBER;
+        }
+    }
+}
+
+
+int editorSyntaxToColour(int highlight) {
+    switch (highlight)
+    {
+        case HL_NUMBER:
+            return 31;
+    
+        default:
+            return 37;
+    }
+}
+
+/*--------------------------------------------------------------------------
                             ROW OPERATIONS
 --------------------------------------------------------------------------*/
 
@@ -235,6 +265,8 @@ void editorUpdateRow(erow *row) {
     }
     row->render[idx] = '\0';
     row->rSize = idx;
+
+    editorUpdateSyntax(row);
 }
 
 
@@ -261,6 +293,7 @@ void editorInsertRow(int at, char *s, size_t len) {
     // Reset rSize & render
     E.row[at].rSize = 0;
     E.row[at].render = NULL;
+    E.row[at].highlight = NULL;
     editorUpdateRow(&E.row[at]);    // Update render & rSize fields with the new row content
 
     E.numrows++;
@@ -271,7 +304,9 @@ void editorInsertRow(int at, char *s, size_t len) {
 void editorFreeRow(erow *row) {
     free(row->render);
     free(row->chars);
+    free(row->highlight);
 }
+
 
 void editorDelRow(int at) {
     // Return if row is undeletable (after EOF)
@@ -643,7 +678,31 @@ void editorDrawRows(struct aBuf *ab) {
             if (len > E.screenCols)
                 len = E.screenCols;
             
-            abAppend(ab, &E.row[fileRow].render[E.colOff], len);
+            char *c = &E.row[fileRow].render[E.colOff];
+            unsigned char *highlight = &E.row[fileRow].highlight[E.colOff];
+            int current_colour = -1;
+
+            for (int j = 0; j < len; j++) {
+                // Print normal characters without highlighting
+                if (highlight[j] == HL_NORMAL) {
+                    if (current_colour != -1) {
+                        abAppend(ab, "\x1b[39m", 5);
+                        current_colour = -1;
+                    }
+                    abAppend(ab, &c[j], 1);
+                } else {
+                    int colour = editorSyntaxToColour(highlight[j]);
+
+                    if (colour != current_colour) {
+                        current_colour = colour;
+                        char buf[16];
+                        int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", colour);
+                        abAppend(ab, buf, clen);
+                    }
+                    abAppend(ab, &c[j], 1);
+                }
+            }
+            abAppend(ab, "\x1b[39m", 5);
         }
 
         abAppend(ab, "\x1b[K", 3);  // Escaape K sequence at end of each line

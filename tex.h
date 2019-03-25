@@ -46,6 +46,11 @@ enum editorKey {
     PAGE_DOWN
 };
 
+enum editorHighlight {
+    HL_NORMAL = 0,
+    HL_NUMBER
+};
+
 /*--------------------------------------------------------------------------
                                    DATA
 --------------------------------------------------------------------------*/
@@ -56,6 +61,7 @@ typedef struct erow {
     int rSize;  // Size of the contents of render
     char *chars;
     char *render;
+    unsigned char *highlight;
 } erow;
 
 struct editorConfig {
@@ -123,6 +129,21 @@ int getCursorPosition(int *rows, int *cols);
     Gets the size of the terminal window
 */
 int getWindowSize(int *rows, int *cols);
+
+/*--------------------------------------------------------------------------
+                          SYNTAX HIGHLIGHTING
+--------------------------------------------------------------------------*/
+
+/*
+
+*/
+void editorUpdateSyntax(erow *row);
+
+
+/*
+    Maps values in highlight to the ANSI colour code to draw them with
+*/
+int editorSyntaxToColour(int highlight);
 
 
 /*--------------------------------------------------------------------------
