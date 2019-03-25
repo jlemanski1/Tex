@@ -177,17 +177,36 @@ int getWindowSize(int *rows, int *cols) {
                           SYNTAX HIGHLIGHTING
 --------------------------------------------------------------------------*/
 
+int isSeparator(int c) {
+    return isspace(c) || c == '\0' || strchr(",.()+-/*=~%<>[];", c) != NULL;
+}
+
+
 void editorUpdateSyntax(erow *row) {
     // Realloc for new row
     row->highlight = realloc(row->highlight, row->rSize);
+
     // Set all characters to HL_NORMAL by default
     memset(row->highlight, HL_NORMAL, row->rSize);
 
+    int prev_sep = 1; // Mark beginning of line to be a separator
+
     // Loop through the characters and set digits to HL_NUMBER
-    for (int i = 0; i < row->rSize; i++) {
-        if (isdigit(row->render[i])) {
+    int i = 0;
+    while (i < row->rSize) {
+        char c = row->render[i];
+        unsigned char prev_hl = (i > 0) ? row->highlight[i - 1] : HL_NORMAL;
+
+        // Highlight Numbers
+        if (isdigit(c) && (prev_sep || prev_hl == HL_NUMBER)) {
             row->highlight[i] = HL_NUMBER;
+            i++;
+            prev_sep = 0;
+            continue;
         }
+
+        prev_sep = isSeparator(c);
+        i++;
     }
 }
 

@@ -24,7 +24,7 @@
 #define CTRL_KEY(k) ((k) &0x1f)
 
 // Version number
-#define TEX_VERSION "0.3.7"
+#define TEX_VERSION "0.3.8"
 
 // Tab Stop Constant
 #define TEX_TAB_STOP 8
@@ -134,6 +134,12 @@ int getWindowSize(int *rows, int *cols);
 /*--------------------------------------------------------------------------
                           SYNTAX HIGHLIGHTING
 --------------------------------------------------------------------------*/
+
+/*
+    Takes in a character and returns true if it's considered a separator character
+*/
+int isSeparator(int c);
+
 
 /*
 

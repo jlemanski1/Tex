@@ -10,6 +10,10 @@ Testing the newline function here
 
 ^^ Reading that on the other hand, does not...
 
+
+Adding a few numbers in here to test the highlight: 1 2 3 4 5 6 7 8 9 10
+(9) & (6) & (3)
+
 TEST FILE
 TEST FILE
 TEST FILE
@@ -18,7 +22,7 @@ TEST FILE
 TEST FILE
 TEST FILE
 TEST FILE
-TEST FILE
+	TEST FILE
 
     TEST FILE
 TEST FILE
