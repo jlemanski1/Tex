@@ -253,6 +253,12 @@ void editorSelectSyntaxHighlight() {
             if ((is_ext && ext && !strcmp(ext, s->filematch[j])) ||
             (!is_ext && strstr(E.filename, s->filematch[j]))) {
                 E.syntax = s;   // Set E.syntax to the current editor syntax struct and return
+                
+                // Loop through each row in the file and call editorUpdateSyntax on it
+                for (int filerow = 0; filerow < E.numrows; filerow++) {
+                    editorUpdateSyntax(&E.row[filerow]);
+                }
+                
                 return;
             }
             j++;
@@ -517,6 +523,8 @@ void editorOpen(char *filename) {
     free(E.filename);   // Free prev filename
     E.filename = strdup(filename);  // Duplicate filename, returns identical malloc-ed string
 
+    editorSelectSyntaxHighlight();  // Detect filetype
+
     FILE *fp = fopen(filename, "r");
     if (!fp)
         die("fopen");
@@ -547,6 +555,7 @@ void editorSave() {
             editorSetStatusMessage("Save aborted!");
             return;
         }
+        editorSelectSyntaxHighlight();
     }
     
     int len;
