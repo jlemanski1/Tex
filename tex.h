@@ -52,9 +52,19 @@ enum editorHighlight {
     HL_MATCH        // Highlights search results
 };
 
+#define HL_HIGHLIGHT_NUMBERS (1<<0)
+
 /*--------------------------------------------------------------------------
                                    DATA
 --------------------------------------------------------------------------*/
+
+// Contains highlighting information for a particular filetype
+struct editorSyntax {
+    char *filetype;     // Name of the full displayed in the status bar
+    char **filematch;   // array of strings that contain a pattern to match against
+    int flags;          // bitfield to flag whether to highlight numbers and strings for that filetype
+};
+
 
 // Stors a row of text in the editor
 typedef struct erow {
@@ -85,11 +95,31 @@ struct editorConfig {
     char statusmsg[80];
     time_t statusmsgTime;
 
+    struct editorSyntax *syntax;    // Ptr to current editorSyntax struct
+
     struct termios orig_termios;
 };
 
 struct editorConfig E;
 
+
+/*--------------------------------------------------------------------------
+                                 FILETYPES
+--------------------------------------------------------------------------*/
+
+// Filematch extensions for C language
+char *C_HL_extensions[] = { ".c", ".h", ".cpp", NULL };
+
+// Syntax Highlight database
+struct editorSyntax HLDB[] = {
+    {
+        "c",
+        C_HL_extensions,
+        HL_HIGHLIGHT_NUMBERS
+    },
+};
+
+#define HLDB_ENTRIES (sizeof(HLDB) / sizeof(HLDB[0]))
 
 /*--------------------------------------------------------------------------
                                   TERMINAL
@@ -151,6 +181,13 @@ void editorUpdateSyntax(erow *row);
     Maps values in highlight to the ANSI colour code to draw them with
 */
 int editorSyntaxToColour(int highlight);
+
+
+/*
+    Mathces the current filename to one of the filematch fields in the HLDB. If one matches,
+    it'll set E.syntax to that filetype
+*/
+void editorSelectSyntaxHighlight();
 
 
 /*--------------------------------------------------------------------------

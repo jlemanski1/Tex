@@ -14,8 +14,8 @@ been less exciting, a 64Kb Memory allocator for a recent example. Has no relatio
 ## Features
 * lightweight minimalist editor with all the basic features you'd expect
 * Robust incremental search with ability to jump between matches
-* Filetype detection  TBA
-* Syntax highlighting TBA
+* Filetype detection
+* Language syntax highlighting
 * Open source
 - - -
 

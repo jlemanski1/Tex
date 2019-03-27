@@ -189,6 +189,10 @@ void editorUpdateSyntax(erow *row) {
     // Set all characters to HL_NORMAL by default
     memset(row->highlight, HL_NORMAL, row->rSize);
 
+    // Return if no filetype is detecting
+    if (E.syntax == NULL)
+        return;
+
     int prev_sep = 1; // Mark beginning of line to be a separator
 
     // Loop through the characters and set digits to HL_NUMBER
@@ -197,12 +201,15 @@ void editorUpdateSyntax(erow *row) {
         char c = row->render[i];
         unsigned char prev_hl = (i > 0) ? row->highlight[i - 1] : HL_NORMAL;
 
-        // Highlight Numbers
-        if (isdigit(c) && (prev_sep || prev_hl == HL_NUMBER)) {
-            row->highlight[i] = HL_NUMBER;
-            i++;
-            prev_sep = 0;
-            continue;
+        // Check if numbers should be highlighted for the current filetype
+        if (E.syntax->flags & HL_HIGHLIGHT_NUMBERS) {
+            // Highlight Numbers
+            if ((isdigit(c) && (prev_sep || prev_hl == HL_NUMBER)) || (c == '.' && prev_hl == HL_NUMBER)) {
+                row->highlight[i] = HL_NUMBER;
+                i++;
+                prev_sep = 0;
+                continue;
+            }
         }
 
         prev_sep = isSeparator(c);
@@ -224,6 +231,35 @@ int editorSyntaxToColour(int highlight) {
             return 37;
     }
 }
+
+
+void editorSelectSyntaxHighlight() {
+    // Set to NULL, so that if nothing matches or there's no name, there is no filetype
+    E.syntax = NULL;
+    if (E.filename == NULL)
+        return;
+
+    char *ext = strchr(E.filename, '.');    // Get a pointer to the extension part of the filename
+
+    // Loop through HLDB
+    for (unsigned int i = 0; i < HLDB_ENTRIES; i ++) {
+        struct editorSyntax *s = &HLDB[i];
+        unsigned int j = 0;
+        // For each entrie, loop through each pattern in it's filematch array
+        while (s->filematch[j]) {
+            int is_ext = (s->filematch[j][0] == '.');
+
+            // If it ends with . check if filename ends with that extension
+            if ((is_ext && ext && !strcmp(ext, s->filematch[j])) ||
+            (!is_ext && strstr(E.filename, s->filematch[j]))) {
+                E.syntax = s;   // Set E.syntax to the current editor syntax struct and return
+                return;
+            }
+            j++;
+        }
+    }
+}
+
 
 /*--------------------------------------------------------------------------
                             ROW OPERATIONS
@@ -761,7 +797,8 @@ void editorDrawStatusBar(struct aBuf *ab) {
         E.filename ? E.filename: "[No Name]", E.numrows,
         E.dirty ? "(modified)" : "");   // Alert user when file is modified since last save
     
-    int rLen = snprintf(rStatus, sizeof(rStatus), "%d/%d", E.cy + 1, E.numrows);
+    int rLen = snprintf(rStatus, sizeof(rStatus), "%s | %d/%d",
+        E.syntax ? E.syntax->filetype : "no ft", E.cy + 1, E.numrows);
 
     if (len > E.screenCols)
         len = E.screenCols;
@@ -1043,12 +1080,15 @@ void initEditor() {
     E.statusmsg[0] = '\0';
     E.statusmsgTime = 0;
 
+    E.syntax = NULL;    // No current filetype, no highlighting
+
     // Error Handling
     if (getWindowSize(&E.screenRows, &E.screenCols) == -1)
         die("getWindowSize");
 
     E.screenRows -= 2;  // Make room for the status bar & status message
 }
+
 
 int main(int argc, char *argv[]) {
     enableRawMode();
