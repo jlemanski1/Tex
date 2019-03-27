@@ -15,7 +15,7 @@ been less exciting, a 64Kb Memory allocator for a recent example. Has no relatio
 * lightweight minimalist editor with all the basic features you'd expect
 * Robust incremental search with ability to jump between matches
 * Filetype detection
-* Language syntax highlighting
+* Language based syntax highlighting
 * Open source
 - - -
 
