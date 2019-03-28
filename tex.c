@@ -192,6 +192,10 @@ void editorUpdateSyntax(erow *row) {
     // Return if no filetype is detecting
     if (E.syntax == NULL)
         return;
+    
+    // Make scs an alias for readability
+    char *scs = E.syntax->singleline_comment_start;
+    int scs_len = scs ? strlen(scs) : 0;    // Used to determine whether to highlight or not
 
     int prev_sep = 1;   // Mark beginning of line to be a separator
     int in_string = 0;  // Keep track of whether char is part of a string or not
@@ -201,6 +205,14 @@ void editorUpdateSyntax(erow *row) {
     while (i < row->rSize) {
         char c = row->render[i];
         unsigned char prev_hl = (i > 0) ? row->highlight[i - 1] : HL_NORMAL;
+
+        // Check if single line comment should be highlighted (not in a string)
+        if (scs_len && !in_string) {
+            if (!strncmp(&row->render[i], scs, scs_len)) {
+                memset(&row->highlight[i], HL_COMMENT, row->rSize - i);
+                break;
+            }
+        }
 
         // Check if strings should be highlighted for the current filetype
         if (E.syntax->flags & HL_HIGHLIGHT_STRINGS) {
@@ -251,6 +263,9 @@ void editorUpdateSyntax(erow *row) {
 
 int editorSyntaxToColour(int highlight) {
     switch (highlight) {
+        case HL_COMMENT:
+            return 36;  // Cyan
+
         case HL_STRING:
             return 35;  // Magenta
 
