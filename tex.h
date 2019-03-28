@@ -16,15 +16,15 @@
 #include <fcntl.h>
 
 
+// Version number
+#define TEX_VERSION "0.3.9"
+
 /*--------------------------------------------------------------------------
                                 DEFINTIONS
 --------------------------------------------------------------------------*/
 
 //0001 1111, Mirrors ctrl key in terminal, strips bits 5&6 from key pressed with ctrl, and sends that
 #define CTRL_KEY(k) ((k) &0x1f)
-
-// Version number
-#define TEX_VERSION "0.3.8"
 
 // Tab Stop Constant
 #define TEX_TAB_STOP 8
@@ -48,11 +48,14 @@ enum editorKey {
 
 enum editorHighlight {
     HL_NORMAL = 0,  // Hightlight keywords
+    HL_STRING,      // Highlight strings
     HL_NUMBER,      // Highlight Numbers
     HL_MATCH        // Highlights search results
 };
 
+// Highlight bitflags
 #define HL_HIGHLIGHT_NUMBERS (1<<0)
+#define HL_HIGHLIGHT_STRINGS (1<<1)
 
 /*--------------------------------------------------------------------------
                                    DATA
@@ -115,7 +118,7 @@ struct editorSyntax HLDB[] = {
     {
         "c",
         C_HL_extensions,
-        HL_HIGHLIGHT_NUMBERS
+        HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
     },
 };
 

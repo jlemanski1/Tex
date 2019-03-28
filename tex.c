@@ -193,13 +193,44 @@ void editorUpdateSyntax(erow *row) {
     if (E.syntax == NULL)
         return;
 
-    int prev_sep = 1; // Mark beginning of line to be a separator
+    int prev_sep = 1;   // Mark beginning of line to be a separator
+    int in_string = 0;  // Keep track of whether char is part of a string or not
 
     // Loop through the characters and set digits to HL_NUMBER
     int i = 0;
     while (i < row->rSize) {
         char c = row->render[i];
         unsigned char prev_hl = (i > 0) ? row->highlight[i - 1] : HL_NORMAL;
+
+        // Check if strings should be highlighted for the current filetype
+        if (E.syntax->flags & HL_HIGHLIGHT_STRINGS) {
+            // String is set, highlight current character
+            if (in_string) {
+                row->highlight[i] = HL_STRING;
+                // Take escape quotes into account, highlight char after backslash then iterate over both
+                if (c == '\\' && i + 1 < row->rSize) {
+                    row->highlight[i + 1] = HL_STRING;
+                    i += 2;
+                    continue;
+                }
+
+                // Reset in_string once character is highlighted
+                if (c == in_string)
+                    in_string = 0;
+                i++;
+                prev_sep = 1;
+                continue;
+            } else {
+                // Check for the beginning of a string
+                if (c == '"' || c == '\'') {
+                    // store the quote in in_string, highlight it, then iterate over it
+                    in_string = c;
+                    row->highlight[i] = HL_STRING;
+                    i++;
+                    continue;
+                }
+            }
+        }
 
         // Check if numbers should be highlighted for the current filetype
         if (E.syntax->flags & HL_HIGHLIGHT_NUMBERS) {
@@ -219,8 +250,10 @@ void editorUpdateSyntax(erow *row) {
 
 
 int editorSyntaxToColour(int highlight) {
-    switch (highlight)
-    {
+    switch (highlight) {
+        case HL_STRING:
+            return 35;  // Magenta
+
         case HL_NUMBER:
             return 31;
 
@@ -976,8 +1009,7 @@ void editorProcessKeyPress() {
     static int quitCount = TEX_QUIT_AMOUNT;    // Track amount of quit keypresses
     int c = editorReadKey();
 
-    switch (c)
-    {
+    switch (c) {
         // ENTER key is pressed, insert newline
         case '\r':
             editorInsertNewLine();
