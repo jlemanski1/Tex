@@ -192,6 +192,9 @@ void editorUpdateSyntax(erow *row) {
     // Return if no filetype is detecting
     if (E.syntax == NULL)
         return;
+
+    // Make keywords an alias for readability
+    char **keywords = E.syntax->keywords;
     
     // Make scs an alias for readability
     char *scs = E.syntax->singleline_comment_start;
@@ -255,6 +258,28 @@ void editorUpdateSyntax(erow *row) {
             }
         }
 
+        // Check if keyword should be highlighted
+        if (prev_sep) {
+            int j;
+            for (j = 0; keywords[j]; j++) {
+                int klen = strlen(keywords[j]);
+                int types = keywords[j][klen - 1] == '|';
+                if (types)
+                    klen--;
+                // Check if there's a keyword to highlight
+                if (!strncmp(&row->render[i], keywords[j], klen) && isSeparator(row->render[i + klen])) {
+                    // Highlight the whole keyword/type at once
+                    memset(&row->highlight[i], types ? HL_TYPE : HL_KEYWORD, klen);
+                    i += klen;
+                    break;
+                }
+            }
+            if (keywords[j] != NULL) {
+                prev_sep = 0;
+                continue;
+            }
+        }
+
         prev_sep = isSeparator(c);
         i++;
     }
@@ -265,6 +290,12 @@ int editorSyntaxToColour(int highlight) {
     switch (highlight) {
         case HL_COMMENT:
             return 36;  // Cyan
+        
+        case HL_KEYWORD:
+            return 33;  // Yellow
+        
+        case HL_TYPE:
+            return 32;  // Green
 
         case HL_STRING:
             return 35;  // Magenta

@@ -17,7 +17,7 @@
 
 
 // Version number
-#define TEX_VERSION "0.3.9"
+#define TEX_VERSION "0.4.0"
 
 /*--------------------------------------------------------------------------
                                 DEFINTIONS
@@ -49,6 +49,8 @@ enum editorKey {
 enum editorHighlight {
     HL_NORMAL = 0,  // Hightlight keywords
     HL_COMMENT,     // Highlight comments
+    HL_KEYWORD,     // Highlight keywords
+    HL_TYPE,        // Highlight common types
     HL_STRING,      // Highlight strings
     HL_NUMBER,      // Highlight numbers
     HL_MATCH        // Highlights search results
@@ -66,6 +68,7 @@ enum editorHighlight {
 struct editorSyntax {
     char *filetype;     // Name of the full displayed in the status bar
     char **filematch;   // array of strings that contain a pattern to match against
+    char **keywords;    // array of strings that contain a language's keywords
     char *singleline_comment_start; // string to hold the start of single line comments, since they differ in langs
     int flags;          // bitfield to flag whether to highlight numbers and strings for that filetype
 };
@@ -115,11 +118,21 @@ struct editorConfig E;
 // Filematch extensions for C language
 char *C_HL_extensions[] = { ".c", ".h", ".cpp", NULL };
 
+// Keywords for C language
+char *C_HL_keywords[] = {
+    "switch", "if", "while", "for", "break", "continue", "return", "else",
+    "struct", "union", "typedef", "static", "enum", "class", "case",
+
+    "int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|",
+    "void|", NULL
+};
+
 // Syntax Highlight database
 struct editorSyntax HLDB[] = {
     {
         "c",
         C_HL_extensions,
+        C_HL_keywords,
         "//",
         HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
     },
