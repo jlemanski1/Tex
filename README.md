@@ -64,9 +64,9 @@ make all
 
 ### Tasks:
 - [x] Implement a search feature
-- [ ] Implement syntax highlighting
-- [ ] Filetype detection
-- [ ] Language based syntax highlighting
+- [x] Implement syntax highlighting
+- [x] Filetype detection
+- [ ] Language based syntax highlighting [IN PROGRESS]
 - [ ] Shift select words
 - [ ] Copy & Paste
 - [ ] Auto indent newlines to same level as previous one
