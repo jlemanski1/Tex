@@ -846,8 +846,21 @@ void editorDrawRows(struct aBuf *ab) {
             int current_colour = -1;
 
             for (int j = 0; j < len; j++) {
+                // Check if input is a control character
+                if (iscntrl(c[j])) {
+                    // Make ctrl letters Capital and nonAlpha ?
+                    char sym = (c[j] <= 26) ? '@' + c[j] : '?';
+                    abAppend(ab, "\x1b[7m", 4);
+                    abAppend(ab, &sym, 1);
+                    abAppend(ab, "\x1b[m", 3);
+                    if (current_colour != -1) {
+                        char buf[16];
+                        int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", current_colour);
+                        abAppend(ab, buf, clen);
+                    }
+                }
                 // Print normal characters without highlighting
-                if (highlight[j] == HL_NORMAL) {
+                else if (highlight[j] == HL_NORMAL) {
                     if (current_colour != -1) {
                         abAppend(ab, "\x1b[39m", 5);
                         current_colour = -1;
