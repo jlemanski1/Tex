@@ -217,7 +217,7 @@ void editorUpdateSyntax(erow *row) {
         unsigned char prev_hl = (i > 0) ? row->highlight[i - 1] : HL_NORMAL;
 
         // Check if single line comment should be highlighted (not in a string)
-        if (scs_len && !in_string) {
+        if (scs_len && !in_string && !in_comment) {
             if (!strncmp(&row->render[i], scs, scs_len)) {
                 memset(&row->highlight[i], HL_COMMENT, row->rSize - i);
                 break;
