@@ -1,4 +1,4 @@
-# Tex
+# Tex 1.0.0
 
 ![Travis (.com)](https://img.shields.io/travis/com/jlemanski1/Tex.svg?style=flat-square)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/jlemanski1/Tex.svg?style=flat-square)
@@ -62,11 +62,11 @@ make all
   `CTRL-Q`     | Quit the editor
   - - -
 
-### Tasks:
+### Future Tasks:
 - [x] Implement a search feature
 - [x] Implement syntax highlighting
 - [x] Filetype detection
-- [ ] Language based syntax highlighting [IN PROGRESS]
+- [x] Language based syntax highlighting
 - [ ] Shift select words
 - [ ] Copy & Paste
 - [ ] Auto indent newlines to same level as previous one
