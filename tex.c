@@ -208,7 +208,8 @@ void editorUpdateSyntax(erow *row) {
 
     int prev_sep = 1;   // Mark beginning of line to be a separator
     int in_string = 0;  // Keep track of whether char is part of a string or not
-    int in_comment = 0; // Keep track of whether char is part of a multiline comment
+    // Keep track of whether char is part of a multiline comment
+    int in_comment = (row->idx > 0 && E.row[row->idx - 1].hl_open_comment);
 
     // Loop through the characters and set digits to HL_NUMBER
     int i = 0;
@@ -314,6 +315,11 @@ void editorUpdateSyntax(erow *row) {
         prev_sep = isSeparator(c);
         i++;
     }
+
+    int changed = (row->hl_open_comment != in_comment);
+    row->hl_open_comment = in_comment;
+    if (changed && row->idx + 1 < E.numrows)
+        editorUpdateSyntax(&E.row[row->idx + 1]);
 }
 
 
@@ -455,6 +461,10 @@ void editorInsertRow(int at, char *s, size_t len) {
     // Make room at the specified index for the new row
     memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
 
+    for (int j = at + 1; j <= E.numrows; j++)
+        E.row[j].idx++;
+
+    E.row[at].idx = at;
     E.row[at].size = len;
     E.row[at].chars = malloc(len + 1);
 
@@ -469,6 +479,7 @@ void editorInsertRow(int at, char *s, size_t len) {
     E.row[at].rSize = 0;
     E.row[at].render = NULL;
     E.row[at].highlight = NULL;
+    E.row[at].hl_open_comment = 0;
     editorUpdateRow(&E.row[at]);    // Update render & rSize fields with the new row content
 
     E.numrows++;
@@ -491,9 +502,13 @@ void editorDelRow(int at) {
     editorFreeRow(&E.row[at]);  // Free memory used by the row
     // Overwrite the deleted row struct with the rest of the rows that come after it
     memmove(&E.row[at], &E.row[at + 1], sizeof(erow) * (E.numrows - at - 1));
+    
+    for (int j = at; j < E.numrows - 1; j++)
+        E.row[j].idx--;
+
     E.numrows--;    // Decrement numrows after deletion
     E.dirty++;      // Mark as modified
-} 
+}
 
 
 void editorRowInsertChar(erow *row, int at, int c) {

@@ -17,7 +17,7 @@
 
 
 // Version number
-#define TEX_VERSION "0.4.0"
+#define TEX_VERSION "1.0.0"
 
 /*--------------------------------------------------------------------------
                                 DEFINTIONS
@@ -79,11 +79,13 @@ struct editorSyntax {
 
 // Stors a row of text in the editor
 typedef struct erow {
+    int idx;    // Index within the file
     int size;
     int rSize;  // Size of the contents of render
     char *chars;
     char *render;
     unsigned char *highlight;
+    int hl_open_comment;
 } erow;
 
 struct editorConfig {
