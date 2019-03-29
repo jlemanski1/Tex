@@ -196,12 +196,19 @@ void editorUpdateSyntax(erow *row) {
     // Make keywords an alias for readability
     char **keywords = E.syntax->keywords;
     
-    // Make scs an alias for readability
+    // Make aliases for readability
     char *scs = E.syntax->singleline_comment_start;
-    int scs_len = scs ? strlen(scs) : 0;    // Used to determine whether to highlight or not
+    char *mcs = E.syntax->multiline_comment_start;
+    char *mce = E.syntax->multiline_comment_end;
+
+    // Used to determine whether to highlight or not
+    int scs_len = scs ? strlen(scs) : 0;
+    int mcs_len = mcs ? strlen(mcs) : 0;
+    int mce_len = mce ? strlen(mce) : 0;;
 
     int prev_sep = 1;   // Mark beginning of line to be a separator
     int in_string = 0;  // Keep track of whether char is part of a string or not
+    int in_comment = 0; // Keep track of whether char is part of a multiline comment
 
     // Loop through the characters and set digits to HL_NUMBER
     int i = 0;
@@ -214,6 +221,30 @@ void editorUpdateSyntax(erow *row) {
             if (!strncmp(&row->render[i], scs, scs_len)) {
                 memset(&row->highlight[i], HL_COMMENT, row->rSize - i);
                 break;
+            }
+        }
+
+        // Check if multi line comment should be highlighted or not
+        if (mcs_len && mce_len && !in_string) {
+            if (in_comment) {
+                row->highlight[i] = HL_MLCOMMENT;
+                // Check for the end of a ML_Comment
+                if (!strncmp(&row->render[i], mce, mce_len)) {
+                    memset(&row->highlight[i], HL_MLCOMMENT, mce_len);
+                    i += mce_len;
+                    in_comment = 0;
+                    prev_sep = 1;
+                    continue;
+                } else {
+                    i++;
+                    continue;
+                }
+            // Check for start of a ML_Comment
+            } else if (!strncmp(&row->render[i], mcs, mcs_len)) {
+                memset(&row->highlight[i], HL_MLCOMMENT, mcs_len);
+                i += mcs_len;
+                in_comment = 1;
+                continue;
             }
         }
 
@@ -289,6 +320,7 @@ void editorUpdateSyntax(erow *row) {
 int editorSyntaxToColour(int highlight) {
     switch (highlight) {
         case HL_COMMENT:
+        case HL_MLCOMMENT:
             return 36;  // Cyan
         
         case HL_KEYWORD:

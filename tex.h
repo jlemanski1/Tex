@@ -49,6 +49,7 @@ enum editorKey {
 enum editorHighlight {
     HL_NORMAL = 0,  // Hightlight keywords
     HL_COMMENT,     // Highlight comments
+    HL_MLCOMMENT,   // Highlight multiline comments
     HL_KEYWORD,     // Highlight keywords
     HL_TYPE,        // Highlight common types
     HL_STRING,      // Highlight strings
@@ -70,6 +71,8 @@ struct editorSyntax {
     char **filematch;   // array of strings that contain a pattern to match against
     char **keywords;    // array of strings that contain a language's keywords
     char *singleline_comment_start; // string to hold the start of single line comments, since they differ in langs
+    char *multiline_comment_start;  // string to hold the start of a multiline comment identifer
+    char *multiline_comment_end;    // string to hold the end of a multiline comment identifer
     int flags;          // bitfield to flag whether to highlight numbers and strings for that filetype
 };
 
@@ -134,6 +137,8 @@ struct editorSyntax HLDB[] = {
         C_HL_extensions,
         C_HL_keywords,
         "//",
+        "/*",
+        "*/",
         HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
     },
 };
