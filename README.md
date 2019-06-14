@@ -20,9 +20,8 @@ been less exciting, a 64Kb Memory allocator for a recent example. Has no relatio
 - - -
 
 ## Installation
-To be Expanded...
 ```bash
-# clone fron git into current directory
+# clone project from git into current directory
 git clone https://github.com/jlemanski1/Tex.git
 
 # Compile
