@@ -17,7 +17,7 @@
 
 
 // Version number
-#define TEX_VERSION "1.0.0"
+#define TEX_VERSION "1.0.2"
 
 /*--------------------------------------------------------------------------
                                 DEFINTIONS

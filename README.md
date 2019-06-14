@@ -1,4 +1,4 @@
-# Tex 1.0.0
+# Tex 1.0.2
 
 ![Travis (.com)](https://img.shields.io/travis/com/jlemanski1/Tex.svg?style=flat-square)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/jlemanski1/Tex.svg?style=flat-square)
