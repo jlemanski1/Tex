@@ -27,15 +27,17 @@ git clone https://github.com/jlemanski1/Tex.git
 
 # Compile
 make all
-...
+
+# Install
+make install
 ```
 - - -
 
 ## Usage
 
   ```bash
-  ./tex            # Create a new file with Tex
-  ./tex test.txt   # Open file test.txt in Tex
+  tex            # Create a new file with Tex
+  tex test.txt   # Open file test.txt in Tex
   ...
   ```
   
