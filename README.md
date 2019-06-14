@@ -28,10 +28,8 @@ git clone https://github.com/jlemanski1/Tex.git
 make all
 
 # Add to binaries
-# .../Tex/
 sudo chmod a+rx tex
 sudo cp tex /usr/local/bin
-...
 ```
 - - -
 
@@ -40,7 +38,6 @@ sudo cp tex /usr/local/bin
   ```bash
   tex            # Create a new file with Tex
   tex test.txt   # Open file test.txt in Tex
-  ...
   ```
   
   ### User Controls
